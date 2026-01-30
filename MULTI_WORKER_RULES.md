@@ -8,10 +8,59 @@
 
 当你完成任务时，**必须**按以下顺序操作：
 
+#### 🔴 特殊规则：coder 角色强制 test 验收流程
+
+**如果你是 coder（开发工程师）角色，完成任务后不能直接标记为完成！**
+
+```bash
+# coder 完成开发后的强制流程：
+1. 不要将任务状态改为 "✅ 完成"
+2. 将任务状态改为 "🔄 待测试"
+3. 向 coordinator 报告 "开发已完成，等待测试验收"
+4. coordinator 必须分配 test 角色进行验收
+5. test 验收通过后，才能标记任务为 "✅ 完成"
+```
+
+**示例**：
+
+```bash
+# coder 完成开发后
+python send coordinator "我是 coder
+
+🔄 任务 [任务ID] 开发已完成: [任务描述]
+产出文件: [文件路径列表]
+完成时间: [时间戳]
+
+状态: 🔄 待测试验收
+请分配 test 角色进行验收测试。"
+
+# coordinator 收到后立即分配 test
+python send test "任务：验收测试任务 [任务ID]
+
+coder 已完成开发，请验收：
+- 功能是否符合需求
+- 代码质量是否达标
+- 是否有明显bug
+
+产出文件: [文件路径列表]
+
+完成后向我汇报测试结果。"
+
+# test 验收完成后
+python send coordinator "我是 test
+
+✅ 任务 [任务ID] 测试验收通过
+验收结果: [通过/有问题]
+问题列表: [如果有]
+
+可以标记为完成。"
+```
+
 #### 1️⃣ 更新 TASK_PROGRESS.md
 
 ```bash
 # 将你的任务状态从 "🔄 进行中" 改为 "✅ 完成"
+# （注意：coder 角色改为 "🔄 待测试"）
 # 记录完成时间
 # 列出产出文件
 ```
@@ -302,60 +351,81 @@ python send <超时角色> "警告：你的任务 [任务ID] 已超时 20 分钟
 
 - [ ] 任务结果已写入 TASK_PROGRESS.md
 - [ ] 相关文件已创建/更新
-- [ ] 已向下一角色发送明确的移交消息
-- [ ] 已向 coordinator 汇报完成
-- [ ] 下一角色已确认收到任务
+- [ ] 已向 coordinator 汇报完成（不直接通知下一角色）
+- [ ] coordinator 已确认收到并分配了测试任务（如需要）
+- [ ] 任务状态已更新到 TASK_PROGRESS.md
 
 示例消息：
 "我是 architect
 任务 1 已完成：用户认证系统架构设计
 产出文件: docs/arch.md, docs/api-spec.md
-已通知: coder
-请更新任务状态"
+请 coordinator 分配下一任务"
+
+"我是 coder
+任务 2 已完成：用户认证功能实现
+产出文件: src/auth/login.py, src/auth/register.py
+请 coordinator 安排 test 验收"
 ```
 
-#### 状态同步工作流示例（完整流程）
+#### 状态同步工作流示例（完整流程 + 强制测试）
 
 ```
 T0: coordinator 创建 TASK_PROGRESS.md
 T1: coordinator → architect "设计用户认证系统" + 更新任务表
 T2: architect 回复 "收到任务，开始执行" + coordinator 更新状态为🔄
 T3: architect 完成 50% → coordinator "进度 50%"
-T4: architect 完成 → 更新 TASK_PROGRESS.md + 通知 coder
-T5: coder 回复 "收到架构文档，开始开发" + coordinator 更新状态
-T6: coder 完成 → 更新 TASK_PROGRESS.md + 通知 test
-T7: test 完成 → 更新 TASK_PROGRESS.md + 通知 coordinator
-T8: coordinator 验收 → 标记所有任务 ✅ 完成
+T4: architect 完成 → 通知 coordinator "任务完成"
+T5: coordinator → coder "开始开发，架构文档见..." + 更新状态
+T6: coder 回复 "收到任务，开始开发" + coordinator 更新状态
+T7: coder 完成 → 通知 coordinator "开发完成，请安排测试" ⚠️ 关键步骤
+T8: coordinator → test "请测试任务X" + 更新状态为 "🧪 待测试"
+T9: test 回复 "收到，开始测试" + 开始测试
+T10: test 完成 → 通知 coordinator "测试完成，结果：通过"
+T11: coordinator 验收 → 标记任务 ✅ 完成 + 分配下一任务
 
 关键点：
 - 每个步骤都有确认回复
 - 每个状态变更都写入文件
-- coordinator 作为中央调度器
+- ⚠️ coordinator 作为中央调度器，统一管理 coder → test 流程
+- coder 完成后必须通知 coordinator，不直接通知 test
+- coordinator 收到通知后立即分配测试任务
 - 文件系统作为持久化备份
 ```
 
 ### 4. 协作工作流示例
 
-#### 场景：开发新功能（含审计流程）
+#### 场景：开发新功能（含强制测试流程）
 
 ```
-1. coordinator 分配任务
+1. coordinator 分配架构设计
    └─> send architect "设计用户认证系统的架构"
 
 2. architect 完成设计
-   └─> send coder "架构设计完成，文档在 docs/arch.md，请开始实现"
+   └─> send coordinator "架构设计完成，文档在 docs/arch.md"
 
-3. coder 完成开发
-   └─> send test "用户认证功能已实现，代码在 src/auth/，请编写测试"
+3. coordinator 分配开发任务
+   └─> send coder "架构已完成，请实现用户认证功能，文档见 docs/arch.md"
 
-4. test 完成测试
-   └─> send coordinator "测试完成，覆盖率 95%，发现 2 个 bug 已修复，可以发布"
+4. coder 完成开发（⚠️ 关键：必须通知 coordinator）
+   └─> send coordinator "用户认证功能已完成，产出文件：src/auth/，请安排测试"
 
-5. coordinator 验收通过
+5. coordinator 分配测试任务（⚠️ 关键：收到通知后立即分配）
+   └─> send test "请测试用户认证功能，代码在 src/auth/，验证登录/注册/密码重置"
+
+6. test 完成测试
+   └─> send coordinator "测试完成，覆盖率 95%，发现 2 个 bug 已修复，建议通过"
+
+7. coordinator 验收通过
+   └─> 更新 TASK_PROGRESS.md 标记 ✅ 完成
+   └─> 分配下一个任务或完成项目
+
+8. 项目全部完成后
    └─> send auditor "项目开发完成，请提示用户进行项目审计"
 
-6. auditor 提示审计（见审计提示词模板）
+9. auditor 提示审计（见审计提示词模板）
    └─> 输出审计提示，等待用户执行审计操作
+
+⚠️ 注意：coder 不直接通知 test，必须通过 coordinator 调度
 ```
 
 ### 5. 启动检查清单
@@ -628,11 +698,48 @@ python send coordinator "审计已完成，审计报告在 docs/AUDIT_REPORT.md�
 - 重要的决策和变更必须通知相关角色
 - 完成工作后必须向下一角色发送明确的移交消息
 
-#### 规则 4: 质量门禁
+#### 规则 4: 强制测试验收流程（Critical）⚠️⚠️⚠️
 
-- coder 完成代码后，必须由 test 进行测试验证
-- test 发现问题，必须通知 coder 修复
-- 所有关键功能必须由 coordinator 最终验收
+**这是强制规则，违反将导致任务无效。每个开发任务完成后必须经过测试验证，由 coordinator 统一调度。**
+
+**为什么由 coordinator 调度而不是 coder 直接通知 test？**
+- ✅ coordinator 上下文更少，更不容易忘记测试环节
+- ✅ 保持中央调度的统一性和可追溯性
+- ✅ 便于任务状态跟踪和 TASK_PROGRESS.md 的统一管理
+- ✅ coder 可能因上下文过长而忘记通知测试
+
+**强制流程**：
+```
+① coder 完成开发
+    ↓
+② coder 必须通知 coordinator（不直接通知 test）
+    python send coordinator "任务X已完成，产出：[file list]，请安排测试"
+    ↓
+③ coordinator 必须立即（5分钟内）分配 test 任务
+    python send test "请测试任务X，内容：[desc]，文件：[files]"
+    更新 TASK_PROGRESS.md 状态为 "🧪 待测试"
+    ↓
+④ test 执行测试验证
+    ↓
+⑤ test 向 coordinator 汇报结果
+    python send coordinator "任务X测试[pass/fail]，报告：[details]"
+    ↓
+⑥ coordinator 验收决策
+    通过 → 更新 TASK_PROGRESS.md 为 ✅ 完成，分配下一任务
+    失败 → python send coder "测试发现问题：[issues]，请修复"
+          → coder 修复后重复步骤②
+```
+
+**禁止行为**：
+- ❌ coder 直接 `send test` （跳过 coordinator）
+- ❌ coder 自行标记任务完成
+- ❌ coordinator 忘记分配 test 验收
+- ❌ test 未验证就标记完成
+
+**违规后果**：
+- 任务无效，必须重新测试
+- 质量无法保证，可能引入bug
+- 任务状态混乱，无法追溯
 
 #### 规则 5: 状态同步强制要求 ⚠️
 
