@@ -7,12 +7,26 @@
 ### 1. 必读文档（按优先级）
 
 ```
+优先级 0: .claude/ALL_ROLES_INSTRUCTIONS.md - 所有角色（除coordinator）必读！
 优先级 1: README.md         - Vibe Coding 核心原则和开发规范
 优先级 2: MULTI_WORKER_RULES.md  - 多角色协作工作流程
 优先级 3: .claude/COORDINATOR_INSTRUCTIONS.md  - Coordinator 角色指令
 ```
 
-### 1.1 如果你扮演 coordinator 角色
+### 1.1 角色必读指南
+
+#### 🔴 如果你是任何角色（architect/coder/test/ui/docs 等）
+
+**必须阅读**: `.claude/ALL_ROLES_INSTRUCTIONS.md`
+
+**最重要的规则**:
+- 任务完成后**必须**通知 coordinator
+- 必须使用标准完成消息模板
+- 任务完成后**必须**清理上下文（`/clear`）
+
+详见：`.claude/ALL_ROLES_INSTRUCTIONS.md`
+
+#### 🟢 如果你是 coordinator 角色
 
 **必须阅读**: `.claude/COORDINATOR_INSTRUCTIONS.md`
 
