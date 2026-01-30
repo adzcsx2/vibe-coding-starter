@@ -91,6 +91,7 @@ Before starting a project, you must modify the `claude.instances` section in `cl
 - **auditor**: After project completion, prompt user for multi-perspective audit, compile audit documentation
 
 Expand other roles as needed:
+
 - `ui` - UI/UX Designer
 - `frontend` - Frontend Developer
 - `backend` - Backend Developer
@@ -116,6 +117,7 @@ python run.py
 ```
 
 The system will automatically:
+
 - Start all instances with `autostart: true`
 - Create independent WezTerm tabs for each instance
 - Generate instance mapping to `.cmw_config/tab_mapping.json`
@@ -166,6 +168,7 @@ python send test "Login feature completed, please test"
 #### Communication Standards
 
 **Message Format Requirements**:
+
 - Clear sender: Message should start with "I am XXX role"
 - Clear task description: What needs to be done, why, expected results
 - Context information: Include necessary file paths, dependencies, prerequisites
@@ -193,6 +196,7 @@ Please confirm receipt and start work.
 **Every development task completion must be tested and validated, coordinated uniformly by coordinator.**
 
 #### Why Coordinator Schedules Instead of Coder Directly Notifying Test?
+
 - ✅ Coordinator has less context, less likely to forget testing phase
 - ✅ Maintains central scheduling consistency
 - ✅ Facilitates task status tracking and TASK_PROGRESS.md unified management
@@ -222,12 +226,14 @@ Please confirm receipt and start work.
 ```
 
 **Forbidden Actions**:
+
 - ❌ coder directly `send test` (bypassing coordinator)
 - ❌ coder marks task complete on their own
 - ❌ coordinator forgets to assign test validation
 - ❌ test validates without marking complete
 
 **Violation Consequences**:
+
 - Task invalid, must retest
 - Quality cannot be guaranteed, may introduce bugs
 - Task status chaotic, cannot trace
@@ -263,26 +269,29 @@ python send coordinator "Task received, starting user authentication system arch
 
 ## Task List
 
-| ID | Description | Assigned To | Status | Assigned | Completed | Notes |
-|----|-------------|-------------|--------|----------|-----------|-------|
-| 1 | Design user auth system | architect | ✅ Complete | T1 | T2 | Docs in docs/arch.md |
-| 2 | Implement login feature | coder | 🔄 In Progress | T2 | - | Est. T4 completion |
-| 3 | Write test cases | test | ⏳ Pending | - | - | Depends on task 2 |
+| ID  | Description             | Assigned To | Status         | Assigned | Completed | Notes                |
+| --- | ----------------------- | ----------- | -------------- | -------- | --------- | -------------------- |
+| 1   | Design user auth system | architect   | ✅ Complete    | T1       | T2        | Docs in docs/arch.md |
+| 2   | Implement login feature | coder       | 🔄 In Progress | T2       | -         | Est. T4 completion   |
+| 3   | Write test cases        | test        | ⏳ Pending     | -        | -         | Depends on task 2    |
 
 ## Status Legend
+
 - ⏳ Pending
-- 🔄 In Progress  
+- 🔄 In Progress
 - 🧪 Testing (coder tasks only - dev done, awaiting test validation)
 - ⏸️ Blocked
 - ✅ Complete
 - ❌ Cancelled
 
 ## Latest Updates
+
 - T3: coder started login feature implementation
 - T2: architect completed architecture design
 ```
 
 **Mandatory Requirements**:
+
 - **coordinator** must update this file when assigning tasks
 - **Executing roles** must sync status when starting/completing
 - **Every status change must notify coordinator**

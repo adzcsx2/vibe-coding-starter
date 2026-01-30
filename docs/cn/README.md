@@ -31,12 +31,14 @@
 **步骤 1**: 阅读 [START_PROJECT.md](START_PROJECT.md) 学习如何开始新项目或继续现有项目。
 
 **步骤 2**: 启动多角色系统：
+
 ```bash
 cd claude-multi-woker
 python run.py
 ```
 
 **步骤 3**: 在 coordinator 标签页中，输入 **"继续"** 来：
+
 - 启动新项目（如果 TASK_PROGRESS.md 不存在）
 - 恢复现有项目（如果 TASK_PROGRESS.md 存在）
 
@@ -72,13 +74,13 @@ python run.py
 
 ### 支持的角色
 
-| 角色 | ID | 职责 |
-|------|-----|----------------|
-| 协调员 | `coordinator` | 任务分配、进度追踪、质量把控 |
-| 架构师 | `architect` | 系统设计、技术栈、架构规划 |
-| 开发者 | `coder` | 代码实现、功能开发 |
-| 测试员 | `test` | 测试用例、质量验证 |
-| 审计员 | `auditor` | 完成后审计和文档汇总（按需启动） |
+| 角色   | ID            | 职责                             |
+| ------ | ------------- | -------------------------------- |
+| 协调员 | `coordinator` | 任务分配、进度追踪、质量把控     |
+| 架构师 | `architect`   | 系统设计、技术栈、架构规划       |
+| 开发者 | `coder`       | 代码实现、功能开发               |
+| 测试员 | `test`        | 测试用例、质量验证               |
+| 审计员 | `auditor`     | 完成后审计和文档汇总（按需启动） |
 
 ### 启动多角色系统
 
@@ -283,6 +285,7 @@ vibe-coding-starter/
 每个 **coder 任务完成后必须经过 test 验收，由 coordinator 统一调度**。
 
 **为什么？**
+
 - ✅ Coordinator 上下文更少，不易忘记测试环节
 - ✅ 保持中央调度的统一性
 - ✅ 便于任务状态追踪
@@ -338,6 +341,7 @@ vibe-coding-starter/
 ## 📞 支持
 
 如有问题或疑问：
+
 - 在 GitHub 上提 issue
 - 查看 [MULTI_WORKER_RULES.md](MULTI_WORKER_RULES.md) 了解协作系统详情
 - 查看 [QUICK_REFERENCE.md](QUICK_REFERENCE.md) 快速参考

@@ -180,13 +180,13 @@ Must update when:
 
 ## 🚫 Common Mistakes
 
-| Mistake | Correct Approach |
-|---------|------------------|
-| ❌ Coordinator writes code themselves | ✅ Use send to assign to coder |
-| ❌ Coder directly sends to test | ✅ Must go through coordinator |
-| ❌ Coder marks task complete themselves | ✅ Notify coordinator to arrange testing |
-| ❌ Coordinator forgets to assign test | ✅ Immediately assign after receiving coder notice |
-| ❌ Resume without reading TASK_PROGRESS.md | ✅ Read file first then continue work |
+| Mistake                                    | Correct Approach                                   |
+| ------------------------------------------ | -------------------------------------------------- |
+| ❌ Coordinator writes code themselves      | ✅ Use send to assign to coder                     |
+| ❌ Coder directly sends to test            | ✅ Must go through coordinator                     |
+| ❌ Coder marks task complete themselves    | ✅ Notify coordinator to arrange testing           |
+| ❌ Coordinator forgets to assign test      | ✅ Immediately assign after receiving coder notice |
+| ❌ Resume without reading TASK_PROGRESS.md | ✅ Read file first then continue work              |
 
 ---
 

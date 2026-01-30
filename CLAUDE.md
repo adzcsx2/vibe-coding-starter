@@ -24,6 +24,7 @@ Priority 3: .claude/COORDINATOR_INSTRUCTIONS.md  - Coordinator role instructions
 **Must Read**: `.claude/ALL_ROLES_INSTRUCTIONS.md`
 
 **Most Important Rules**:
+
 - **Must** notify coordinator after task completion
 - Must use standard completion message template
 - **Must** clear context (`/clear`) after task completion
@@ -35,6 +36,7 @@ See: `.claude/ALL_ROLES_INSTRUCTIONS.md`
 **Must Read**: `.claude/COORDINATOR_INSTRUCTIONS.md`
 
 **Most Important Instruction**: Handle user's "continue" command
+
 - When user says "continue", first check if `TASK_PROGRESS.md` exists
 - If exists → Read and restore project status
 - If not exists → Start new project workflow
@@ -44,6 +46,7 @@ See: `.claude/COORDINATOR_INSTRUCTIONS.md`
 ### 2. Core Principles (from README.md)
 
 #### 🔑 Key Principle
+
 **"Planning is everything. Do NOT let the AI plan autonomously, or your codebase will become an unmanageable mess."**
 
 #### 📐 Mandatory Rules
@@ -83,6 +86,7 @@ See: `.claude/COORDINATOR_INSTRUCTIONS.md`
    - ❌ **Forbidden** to automatically determine or guess which branch to use
 
    **Execution Flow**:
+
    ```
    At task startup:
    1. Display: "Current branch: [branch-name]"

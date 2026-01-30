@@ -31,12 +31,14 @@ This project combines the **Vibe Coding methodology** with a **Multi-Worker AI c
 **Step 1**: Read [START_PROJECT.md](START_PROJECT.md) to learn how to start a new project or continue an existing one.
 
 **Step 2**: Start the multi-worker system:
+
 ```bash
 cd claude-multi-woker
 python run.py
 ```
 
 **Step 3**: In the coordinator tab, say **"继续"** (continue) to:
+
 - Start a new project (if no TASK_PROGRESS.md exists)
 - Resume an existing project (if TASK_PROGRESS.md exists)
 
@@ -72,13 +74,13 @@ The multi-worker system enables you to run multiple AI instances simultaneously,
 
 ### Supported Roles
 
-| Role | ID | Responsibility |
-|------|-----|----------------|
+| Role        | ID            | Responsibility                                      |
+| ----------- | ------------- | --------------------------------------------------- |
 | Coordinator | `coordinator` | Task allocation, progress tracking, quality control |
-| Architect | `architect` | System design, tech stack, architecture planning |
-| Developer | `coder` | Code implementation, feature development |
-| Tester | `test` | Test cases, quality validation |
-| Auditor | `auditor` | Post-completion audit and documentation (on-demand) |
+| Architect   | `architect`   | System design, tech stack, architecture planning    |
+| Developer   | `coder`       | Code implementation, feature development            |
+| Tester      | `test`        | Test cases, quality validation                      |
+| Auditor     | `auditor`     | Post-completion audit and documentation (on-demand) |
 
 ### Starting Multi-Worker System
 
@@ -292,6 +294,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For questions or issues:
+
 - Open an issue on GitHub
 - Check the [MULTI_WORKER_RULES.md](MULTI_WORKER_RULES.md) for collaboration system details
 - Review the [Vibe Coding Guide](https://github.com/EnzeD/vibe-coding) for methodology questions

@@ -55,6 +55,7 @@ Start now: Please first ask the user about project requirements.
 ### Step 4: Interact with Coordinator
 
 The coordinator will automatically:
+
 - Ask about your project requirements
 - Create necessary documents
 - Launch multi-role collaboration workflow
@@ -72,6 +73,7 @@ continue
 ```
 
 The coordinator will automatically:
+
 1. Read TASK_PROGRESS.md
 2. Restore project status
 3. Continue coordinating work
