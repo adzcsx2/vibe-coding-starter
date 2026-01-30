@@ -152,6 +152,139 @@ python send test "登录功能已完成，请进行测试"
 请确认收到并开始工作。
 ```
 
+#### ⚠️ 强制性状态同步机制
+
+**为了防止上下文丢失和任务遗漏，所有角色必须遵守以下强制规则**：
+
+##### 规则 1: 任务确认机制（强制性）
+
+```bash
+# 接收任务时必须回复确认
+✅ 正确示例：
+python send coordinator "收到任务，开始执行用户认证系统架构设计"
+
+❌ 错误做法：
+- 只收到任务不回复
+- 假设对方已收到消息
+```
+
+##### 规则 2: 任务状态追踪文件（强制性）
+
+**项目根目录必须维护** `TASK_PROGRESS.md`：
+
+```markdown
+# 任务进度追踪表
+
+> 本文件由 coordinator 维护，所有角色必须实时同步
+
+## 任务列表
+
+| ID | 任务描述 | 分配给 | 状态 | 分配时间 | 完成时间 | 备注 |
+|----|---------|--------|------|----------|----------|------|
+| 1 | 设计用户认证系统架构 | architect | ✅ 完成 | T1 | T2 | 文档在 docs/arch.md |
+| 2 | 实现登录功能 | coder | 🔄 进行中 | T2 | - | 预计 T4 完成 |
+| 3 | 编写测试用例 | test | ⏳ 待开始 | - | - | 依赖任务 2 |
+| 4 | 项目审计 | auditor | ⏳ 待开始 | - | - | 依赖任务 3 |
+
+## 状态图例
+- ⏳ 待开始 (Pending)
+- 🔄 进行中 (In Progress)
+- ⏸️ 已阻塞 (Blocked)
+- ✅ 已完成 (Completed)
+- ❌ 已取消 (Cancelled)
+
+## 最近更新
+- T3: coder 开始实现登录功能
+- T2: architect 完成架构设计
+```
+
+**强制性要求**：
+- **coordinator** 必须在分配任务时更新此文件
+- **执行角色** 必须在开始/完成时同步状态
+- **每次状态变更必须通知 coordinator**
+
+##### 规则 3: 定期心跳机制（强制性）
+
+```python
+# 每个角色每完成一个里程碑必须汇报
+
+# architect 完成部分设计时：
+python send coordinator "进度更新: 已完成 50% 架构设计，预计 T2 全部完成"
+
+# coder 完成一个模块时：
+python send coordinator "进度更新: 登录模块已完成 80%，用户注册已完成"
+
+# test 遇到阻塞时：
+python send coordinator "阻塞报告: 缺少 API 文档，无法继续测试，请协调"
+```
+
+##### 规则 4: 上下文保护机制（强制性）
+
+```bash
+# 每个角色必须定期清理上下文，防止溢出
+
+# 当 context usage > 60% 时：
+1. 将当前状态写入 TASK_PROGRESS.md
+2. 将重要决策写入 memory-bank/ 目录
+3. 使用 /clear 清空对话
+4. 重新读取 TASK_PROGRESS.md 恢复上下文
+
+# 示例恢复流程：
+"我已经清空了上下文。请读取 TASK_PROGRESS.md 恢复我的工作状态。
+当前我正在执行任务 2: 实现登录功能，进度 80%"
+```
+
+##### 规则 5: 超时检测与恢复（强制性）
+
+```python
+# coordinator 必须定期检查任务状态
+
+# 每 10 分钟检查一次（在 coordinator 角色中）：
+python send coordinator "检查任务状态：读取 TASK_PROGRESS.md，确认所有进行中任务是否有进度更新"
+
+# 发现超时任务：
+python send <超时角色> "警告：你的任务 [任务ID] 已超时 20 分钟，请报告当前状态或说明是否遇到问题"
+```
+
+##### 规则 6: 任务移交检查清单（强制性）
+
+```
+任务完成移交前必须检查：
+
+- [ ] 任务结果已写入 TASK_PROGRESS.md
+- [ ] 相关文件已创建/更新
+- [ ] 已向下一角色发送明确的移交消息
+- [ ] 已向 coordinator 汇报完成
+- [ ] 下一角色已确认收到任务
+
+示例消息：
+"我是 architect
+任务 1 已完成：用户认证系统架构设计
+产出文件: docs/arch.md, docs/api-spec.md
+已通知: coder
+请更新任务状态"
+```
+
+#### 状态同步工作流示例（完整流程）
+
+```
+T0: coordinator 创建 TASK_PROGRESS.md
+T1: coordinator → architect "设计用户认证系统" + 更新任务表
+T2: architect 回复 "收到任务，开始执行" + coordinator 更新状态为🔄
+T3: architect 完成 50% → coordinator "进度 50%"
+T4: architect 完成 → 更新 TASK_PROGRESS.md + 通知 coder
+T5: coder 回复 "收到架构文档，开始开发" + coordinator 更新状态
+T6: coder 完成 → 更新 TASK_PROGRESS.md + 通知 test
+T7: test 完成 → 更新 TASK_PROGRESS.md + 通知 coordinator
+T8: coordinator 验收 → 标记所有任务 ✅ 完成
+
+关键点：
+- 每个步骤都有确认回复
+- 每个状态变更都写入文件
+- coordinator 作为中央调度器
+- 文件系统作为持久化备份
+```
+
 ### 4. 协作工作流示例
 
 #### 场景：开发新功能（含审计流程）
@@ -182,11 +315,13 @@ python send test "登录功能已完成，请进行测试"
 
 - [ ] **步骤 1**: 根据项目类型，修改 `claude-multi-woker/cmw.config` 定义角色
 - [ ] **步骤 2**: 确认已安装 WezTerm (`wezterm --version`)
-- [ ] **步骤 3**: 在 WezTerm 终端中运行 `cd claude-multi-woker && python run.py`
-- [ ] **步骤 4**: 等待所有实例启动完成（会看到多个标签页）
-- [ ] **步骤 5**: 切换到 coordinator 标签页
-- [ ] **步骤 6**: 在 coordinator 中输入启动提示词（见下方模板）
-- [ ] **步骤 7**: 观察各角色开始协作工作
+- [ ] **步骤 3**: 创建项目根目录 `TASK_PROGRESS.md` 任务追踪文件
+- [ ] **步骤 4**: 在 WezTerm 终端中运行 `cd claude-multi-woker && python run.py`
+- [ ] **步骤 5**: 等待所有实例启动完成（会看到多个标签页）
+- [ ] **步骤 6**: 切换到 coordinator 标签页
+- [ ] **步骤 7**: 在 coordinator 中输入启动提示词（见下方模板）
+- [ ] **步骤 8**: coordinator 确认所有角色已就绪
+- [ ] **步骤 9**: 观察各角色开始协作工作并同步状态
 
 ### 6. 标准启动提示词模板
 
@@ -450,6 +585,39 @@ python send coordinator "审计已完成，审计报告在 docs/AUDIT_REPORT.md�
 - test 发现问题，必须通知 coder 修复
 - 所有关键功能必须由 coordinator 最终验收
 
+#### 规则 5: 状态同步强制要求 ⚠️
+
+**违反以下任何一条将导致任务丢失风险**：
+
+- ✅ **任务确认**: 接收任务必须回复确认
+- ✅ **状态更新**: 每个状态变更必须写入 `TASK_PROGRESS.md`
+- ✅ **进度汇报**: 每完成一个里程碑必须向 coordinator 汇报
+- ✅ **上下文保护**: context usage > 60% 时必须清理并恢复
+- ✅ **移交检查**: 任务移交前必须完成检查清单
+- ✅ **超时检测**: coordinator 每 10 分钟检查任务状态
+
+**违规后果**：
+- 任务可能丢失或重复执行
+- 无法追溯问题根源
+- 项目进度无法准确评估
+- 团队协作混乱
+
+#### 规则 6: 上下文管理强制要求
+
+- ❌ **禁止**: 单个对话超过 context usage 的 60%
+- ✅ **必须**: 定期使用 `/clear` 并从 `TASK_PROGRESS.md` 恢复
+- ✅ **必须**: 重要决策写入 `memory-bank/` 永久保存
+- ✅ **必须**: 角色切换前保存当前状态到文件
+
+**强制恢复流程**：
+```bash
+# 当上下文即将溢出时
+1. 将当前进度写入 TASK_PROGRESS.md
+2. 将关键决策写入 memory-bank/
+3. 使用 /clear 清空对话
+4. 读取 TASK_PROGRESS.md 恢复工作状态
+```
+
 ## 项目类型与角色配置
 
 ### Web 应用项目
@@ -548,6 +716,58 @@ python send auditor "项目开发已完成，请提示用户进行项目审计"
 python send coordinator "审计已完成，审计报告在 docs/AUDIT_REPORT.md"
 ```
 
+### 状态同步命令（重要）
+
+```bash
+# 任务确认（接收任务后立即回复）
+python send coordinator "收到任务 [ID]，开始执行"
+
+# 进度汇报（每完成一个里程碑）
+python send coordinator "进度更新: 任务 [ID] 已完成 50%"
+
+# 任务完成（完成时通知）
+python send coordinator "任务 [ID] 已完成，产出: [文件路径]"
+
+# 阻塞报告（遇到问题时）
+python send coordinator "阻塞报告: 任务 [ID] 被阻塞，原因: [描述]"
+
+# 上下文恢复（清理后恢复状态）
+"读取 TASK_PROGRESS.md，当前任务: [ID]，状态: [进行中/已完成]"
+
+# 超时检测（coordinator 定期执行）
+python send coordinator "检查任务状态: 读取 TASK_PROGRESS.md 确认所有任务进度"
+```
+
+### TASK_PROGRESS.md 更新时机
+
+```bash
+# 必须更新 TASK_PROGRESS.md 的时机：
+1. coordinator 分配任务时
+2. 角色接收任务确认时
+3. 任务状态变更时（待开始→进行中→完成）
+4. 完成里程碑时
+5. 遇到阻塞时
+6. 上下文清理前（保存当前状态）
+```
+
+### 上下文保护流程
+
+```bash
+# 当 context usage > 60% 时强制执行：
+
+# 步骤 1: 保存状态
+echo "更新 TASK_PROGRESS.md 记录当前进度"
+
+# 步骤 2: 保存关键决策
+echo "将重要决策写入 memory-bank/ 目录"
+
+# 步骤 3: 清理上下文
+/clear
+
+# 步骤 4: 恢复状态
+"请读取 TASK_PROGRESS.md 和 memory-bank/ 目录，恢复我的工作状态"
+```
+
 ## 注意事项
 
 1. **消息编码**: 目前 MCP 工具对中文支持有限，发送中文消息请使用命令行方式
@@ -568,6 +788,17 @@ python send coordinator "审计已完成，审计报告在 docs/AUDIT_REPORT.md"
 
 ## 版本历史
 
+- v1.3 (2025-01-30):
+  - 🔒 **核心更新**: 添加强制性状态同步机制
+  - 添加 TASK_PROGRESS.md 任务追踪系统
+  - 添加任务确认机制（防止任务丢失）
+  - 添加定期心跳汇报机制
+  - 添加上下文保护机制（防止溢出）
+  - 添加超时检测与恢复机制
+  - 添加任务移交检查清单
+  - 更新强制执行规则（规则 5、规则 6）
+  - 添加状态同步工作流示例
+  - 添加快速参考卡中的状态同步命令
 - v1.2 (2025-01-30):
   - 添加 auditor（审计员）角色
   - 添加审计工作流程和提示词模板
