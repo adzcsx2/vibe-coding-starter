@@ -1,115 +1,46 @@
-# Claude Multi-Worker 协作规范
+# Multi-Worker Collaboration Guidelines
 
-## ⚠️⚠️⚠️ 所有角色必读（最高优先级）
-
-**你是某个角色（architect/coder/test/或其他）？在开始任何工作前，必须阅读本节！**
-
-### 🚨 任务完成强制流程（所有角色必须遵守）
-
-当你完成任务时，**必须**按以下顺序操作：
-
-#### 🔴 特殊规则：coder 角色强制 test 验收流程
-
-**如果你是 coder（开发工程师）角色，完成任务后不能直接标记为完成！**
-
-```bash
-# coder 完成开发后的强制流程：
-1. 不要将任务状态改为 "✅ 完成"
-2. 将任务状态改为 "🔄 待测试"
-3. 向 coordinator 报告 "开发已完成，等待测试验收"
-4. coordinator 必须分配 test 角色进行验收
-5. test 验收通过后，才能标记任务为 "✅ 完成"
-```
-
-**示例**：
-
-```bash
-# coder 完成开发后
-python send coordinator "我是 coder
-
-🔄 任务 [任务ID] 开发已完成: [任务描述]
-产出文件: [文件路径列表]
-完成时间: [时间戳]
-
-状态: 🔄 待测试验收
-请分配 test 角色进行验收测试。"
-
-# coordinator 收到后立即分配 test
-python send test "任务：验收测试任务 [任务ID]
-
-coder 已完成开发，请验收：
-- 功能是否符合需求
-- 代码质量是否达标
-- 是否有明显bug
-
-产出文件: [文件路径列表]
-
-完成后向我汇报测试结果。"
-
-# test 验收完成后
-python send coordinator "我是 test
-
-✅ 任务 [任务ID] 测试验收通过
-验收结果: [通过/有问题]
-问题列表: [如果有]
-
-可以标记为完成。"
-```
-
-#### 1️⃣ 更新 TASK_PROGRESS.md
-
-```bash
-# 将你的任务状态从 "🔄 进行中" 改为 "✅ 完成"
-# （注意：coder 角色改为 "🔄 待测试"）
-# 记录完成时间
-# 列出产出文件
-```
-
-#### 2️⃣ 通知 coordinator
-
-```bash
-# 使用标准模板通知 coordinator
-python send coordinator "我是 [你的角色名]
-
-✅ 任务 [任务ID] 已完成: [任务描述]
-产出文件: [文件路径列表]
-完成时间: [时间戳]
-
-请更新任务状态并分配下一任务。"
-```
-
-#### 3️⃣ 清理上下文
-
-```bash
-# 任务完成后必须清理上下文
-/clear
-
-# 恢复时读取 TASK_PROGRESS.md
-"请读取 TASK_PROGRESS.md，我是 [角色名]，等待新任务"
-```
-
-### ⚠️ 违规后果
-
-**如果不遵守此规则**：
-
-- ❌ 协作流程卡死（coordinator 不知道你已完成）
-- ❌ 上下文溢出（下次任务性能下降）
-- ❌ 项目进度无法追踪
-- ❌ **协作失败**
+**Language**: [English](MULTI_WORKER_RULES.md) | [中文](docs/cn/MULTI_WORKER_RULES.md)
 
 ---
 
-## 规范概述
+## Overview
 
-在创建新项目或新增需求时，必须使用 `claude-multi-woker` 功能，创建多个角色分工协作完成。
+When creating a new project or adding new requirements, you must use the `claude-multi-woker` feature to create multiple roles working collaboratively.
 
-## 工作流程
+**⚠️ Important Note: Toolkit Positioning**
 
-### 1. 角色定义与配置
+**`claude-multi-woker` is a toolkit directory, not the project itself.**
 
-在开始项目前，必须先修改 `claude-multi-woker/cmw.config` 中的 `claude.instances` 部分，定义项目所需的角色。
+### Toolkit vs Project Relationship
 
-#### 通用角色模板
+```
+Project Root/                      # ← Your actual project is here
+├── README.md                      # ← Read project rules from here
+├── CLAUDE.md                      # ← Read development guidelines from here
+├── TASK_PROGRESS.md               # ← Update this file
+├── memory-bank/                   # ← Work here
+└── claude-multi-woker/            # ← Toolkit (only for launching)
+    ├── run.py                     # ← Launch script
+    └── send                       # ← Communication tool
+```
+
+### Core Rules
+
+1. **Toolkit Responsibility**: `claude-multi-woker/` is only for launching the multi-role system
+2. **Project File Location**: All project files are in **project root** (parent directory)
+3. **Read Rules**: After launching, all Claude instances must read rules from project root
+4. **Work Location**: Code, docs, and configs are in project root, not in toolkit directory
+
+---
+
+## Workflow
+
+### 1. Role Definition and Configuration
+
+Before starting a project, you must modify the `claude.instances` section in `claude-multi-woker/cmw.config` to define required roles.
+
+#### Common Role Template
 
 ```json
 {
@@ -121,27 +52,27 @@ python send coordinator "我是 [你的角色名]
     "instances": [
       {
         "id": "coordinator",
-        "role": "项目协调员 - 负责任务分配、进度跟踪、质量把控",
+        "role": "Project Coordinator - Task allocation, progress tracking, quality control",
         "autostart": true
       },
       {
         "id": "architect",
-        "role": "架构师 - 负责系统设计、技术选型、架构规划",
+        "role": "Architect - System design, tech stack, architecture planning",
         "autostart": true
       },
       {
         "id": "coder",
-        "role": "开发工程师 - 负责代码实现、功能开发",
+        "role": "Developer - Code implementation, feature development",
         "autostart": true
       },
       {
         "id": "test",
-        "role": "测试工程师 - 负责测试用例编写、质量验证",
+        "role": "Test Engineer - Test cases, quality validation",
         "autostart": true
       },
       {
         "id": "auditor",
-        "role": "项目审计员 - 负责完成后的项目审计提示和文档汇总",
+        "role": "Project Auditor - Post-completion audit and documentation",
         "autostart": false
       }
     ]
@@ -149,1015 +80,325 @@ python send coordinator "我是 [你的角色名]
 }
 ```
 
-**注意**: `auditor` 角色设置为 `autostart: false`，只在项目需要审计时启动。
-
-#### 角色职责说明
-
-- **coordinator** (协调员): 总负责人，分配任务、协调进度、验收结果
-- **architect** (架构师): 设计系统架构、技术方案、目录结构
-- **coder** (开发): 实现具体功能、编写业务代码
-- **test** (测试): 编写测试、验证功能、报告问题
-- **auditor** (审计员): 在项目完成后，提示用户进行多角度审计，汇总审计文档
-
-根据项目需求，可扩展其他角色如：
-
-- `ui` - UI/UX 设计师
-- `frontend` - 前端开发
-- `backend` - 后端开发
-- `devops` - 运维工程师
-- `docs` - 文档编写员
-
-### 2. 启动多实例系统
-
-#### 步骤 1: 打开 WezTerm 终端
-
-**重要提示**: 必须在 **WezTerm** 终端中运行，不支持其他终端！
-
-- 检查 WezTerm 是否安装: `wezterm --version`
-- 如未安装，访问: https://wezterm.org/index.html
-
-#### 步骤 2: 启动多实例
-
-```bash
-cd claude-multi-woker
-python run.py
-```
-
-系统会自动：
-
-- 启动所有 `autostart: true` 的实例
-- 为每个实例创建独立的 WezTerm 标签页
-- 生成实例映射到 `.cmw_config/tab_mapping.json`
-
-#### 步骤 3: 在 coordinator 角色中启动项目
-
-切换到 **coordinator** 标签页，输入以下启动提示词：
-
-```
-开始项目协作模式
-
-项目名称: [项目名称]
-项目类型: [Web应用/CLI工具/库/其他]
-项目目标: [一句话描述项目目标]
-
-角色配置:
-- coordinator (我): 项目协调员
-- architect: 架构师
-- coder: 开发工程师
-- test: 测试工程师
-
-请开始协调项目开发:
-1. 向 architect 发送架构设计任务
-2. 等待架构设计完成后，向 coder 分配开发任务
-3. 开发完成后，要求 test 进行测试验证
-4. 测试通过后，进行最终验收
-
-现在请向 architect 发送第一条任务消息。
-```
-
-系统将自动开始协作流程。
-
-### 3. 角色间通信机制
-
-#### 通信命令格式
-
-```bash
-# 基本格式
-python send <角色ID> "消息内容"
-
-# 示例
-python send coder "请实现用户登录功能"
-python send test "登录功能已完成，请进行测试"
-```
-
-#### 通信规范
-
-**消息格式要求**：
-
-- 明确发送方：消息开头应表明"我是xxx角色"
-- 清晰的任务描述：说明需要做什么、为什么、期望结果
-- 上下文信息：包含必要的文件路径、依赖关系、前置条件
-
-**标准消息模板**：
-
-```
-【角色间通信模板】
-
-我是 [发送方角色]
-
-任务：[具体要做的事情]
-背景：[为什么需要这个任务]
-要求：[具体的验收标准]
-相关文件：[涉及的文件或目录]
-依赖：[前置条件或依赖的其他角色工作]
-
-请确认收到并开始工作。
-```
-
-#### ⚠️ 强制性状态同步机制
-
-**为了防止上下文丢失和任务遗漏，所有角色必须遵守以下强制规则**：
-
-##### 规则 1: 任务确认机制（强制性）
-
-```bash
-# 接收任务时必须回复确认
-✅ 正确示例：
-python send coordinator "收到任务，开始执行用户认证系统架构设计"
-
-❌ 错误做法：
-- 只收到任务不回复
-- 假设对方已收到消息
-```
-
-##### 规则 2: 任务状态追踪文件（强制性）
-
-**项目根目录必须维护** `TASK_PROGRESS.md`：
-
-```markdown
-# 任务进度追踪表
-
-> 本文件由 coordinator 维护，所有角色必须实时同步
-
-## 任务列表
-
-| ID  | 任务描述             | 分配给    | 状态      | 分配时间 | 完成时间 | 备注                |
-| --- | -------------------- | --------- | --------- | -------- | -------- | ------------------- |
-| 1   | 设计用户认证系统架构 | architect | ✅ 完成   | T1       | T2       | 文档在 docs/arch.md |
-| 2   | 实现登录功能         | coder     | 🔄 进行中 | T2       | -        | 预计 T4 完成        |
-| 3   | 编写测试用例         | test      | ⏳ 待开始 | -        | -        | 依赖任务 2          |
-| 4   | 项目审计             | auditor   | ⏳ 待开始 | -        | -        | 依赖任务 3          |
-
-## 状态图例
-
-- ⏳ 待开始 (Pending)
-- 🔄 进行中 (In Progress)
-- ⏸️ 已阻塞 (Blocked)
-- ✅ 已完成 (Completed)
-- ❌ 已取消 (Cancelled)
-
-## 最近更新
-
-- T3: coder 开始实现登录功能
-- T2: architect 完成架构设计
-```
-
-**强制性要求**：
-
-- **coordinator** 必须在分配任务时更新此文件
-- **执行角色** 必须在开始/完成时同步状态
-- **每次状态变更必须通知 coordinator**
-
-##### 规则 3: 定期心跳机制（强制性）
-
-```python
-# 每个角色每完成一个里程碑必须汇报
-
-# architect 完成部分设计时：
-python send coordinator "进度更新: 已完成 50% 架构设计，预计 T2 全部完成"
-
-# coder 完成一个模块时：
-python send coordinator "进度更新: 登录模块已完成 80%，用户注册已完成"
-
-# test 遇到阻塞时：
-python send coordinator "阻塞报告: 缺少 API 文档，无法继续测试，请协调"
-```
-
-##### 规则 4: 上下文保护机制（强制性）
-
-```bash
-# 每个角色必须定期清理上下文，防止溢出
-
-# 当 context usage > 60% 时：
-1. 将当前状态写入 TASK_PROGRESS.md
-2. 将重要决策写入 memory-bank/ 目录
-3. 使用 /clear 清空对话
-4. 重新读取 TASK_PROGRESS.md 恢复上下文
-
-# 示例恢复流程：
-"我已经清空了上下文。请读取 TASK_PROGRESS.md 恢复我的工作状态。
-当前我正在执行任务 2: 实现登录功能，进度 80%"
-```
-
-##### 规则 5: 超时检测与恢复（强制性）
-
-```python
-# coordinator 必须定期检查任务状态
-
-# 每 10 分钟检查一次（在 coordinator 角色中）：
-python send coordinator "检查任务状态：读取 TASK_PROGRESS.md，确认所有进行中任务是否有进度更新"
-
-# 发现超时任务：
-python send <超时角色> "警告：你的任务 [任务ID] 已超时 20 分钟，请报告当前状态或说明是否遇到问题"
-```
-
-##### 规则 6: 任务移交检查清单（强制性）
-
-```
-任务完成移交前必须检查：
-
-- [ ] 任务结果已写入 TASK_PROGRESS.md
-- [ ] 相关文件已创建/更新
-- [ ] 已向 coordinator 汇报完成（不直接通知下一角色）
-- [ ] coordinator 已确认收到并分配了测试任务（如需要）
-- [ ] 任务状态已更新到 TASK_PROGRESS.md
-
-示例消息：
-"我是 architect
-任务 1 已完成：用户认证系统架构设计
-产出文件: docs/arch.md, docs/api-spec.md
-请 coordinator 分配下一任务"
-
-"我是 coder
-任务 2 已完成：用户认证功能实现
-产出文件: src/auth/login.py, src/auth/register.py
-请 coordinator 安排 test 验收"
-```
-
-#### 状态同步工作流示例（完整流程 + 强制测试）
-
-```
-T0: coordinator 创建 TASK_PROGRESS.md
-T1: coordinator → architect "设计用户认证系统" + 更新任务表
-T2: architect 回复 "收到任务，开始执行" + coordinator 更新状态为🔄
-T3: architect 完成 50% → coordinator "进度 50%"
-T4: architect 完成 → 通知 coordinator "任务完成"
-T5: coordinator → coder "开始开发，架构文档见..." + 更新状态
-T6: coder 回复 "收到任务，开始开发" + coordinator 更新状态
-T7: coder 完成 → 通知 coordinator "开发完成，请安排测试" ⚠️ 关键步骤
-T8: coordinator → test "请测试任务X" + 更新状态为 "🧪 待测试"
-T9: test 回复 "收到，开始测试" + 开始测试
-T10: test 完成 → 通知 coordinator "测试完成，结果：通过"
-T11: coordinator 验收 → 标记任务 ✅ 完成 + 分配下一任务
-
-关键点：
-- 每个步骤都有确认回复
-- 每个状态变更都写入文件
-- ⚠️ coordinator 作为中央调度器，统一管理 coder → test 流程
-- coder 完成后必须通知 coordinator，不直接通知 test
-- coordinator 收到通知后立即分配测试任务
-- 文件系统作为持久化备份
-```
-
-### 4. 协作工作流示例
-
-#### 场景：开发新功能（含强制测试流程）
-
-```
-1. coordinator 分配架构设计
-   └─> send architect "设计用户认证系统的架构"
-
-2. architect 完成设计
-   └─> send coordinator "架构设计完成，文档在 docs/arch.md"
-
-3. coordinator 分配开发任务
-   └─> send coder "架构已完成，请实现用户认证功能，文档见 docs/arch.md"
-
-4. coder 完成开发（⚠️ 关键：必须通知 coordinator）
-   └─> send coordinator "用户认证功能已完成，产出文件：src/auth/，请安排测试"
-
-5. coordinator 分配测试任务（⚠️ 关键：收到通知后立即分配）
-   └─> send test "请测试用户认证功能，代码在 src/auth/，验证登录/注册/密码重置"
-
-6. test 完成测试
-   └─> send coordinator "测试完成，覆盖率 95%，发现 2 个 bug 已修复，建议通过"
-
-7. coordinator 验收通过
-   └─> 更新 TASK_PROGRESS.md 标记 ✅ 完成
-   └─> 分配下一个任务或完成项目
-
-8. 项目全部完成后
-   └─> send auditor "项目开发完成，请提示用户进行项目审计"
-
-9. auditor 提示审计（见审计提示词模板）
-   └─> 输出审计提示，等待用户执行审计操作
-
-⚠️ 注意：coder 不直接通知 test，必须通过 coordinator 调度
-```
-
-### 5. 启动检查清单
-
-在开始任何项目前，请按顺序完成以下步骤：
-
-- [ ] **步骤 1**: 根据项目类型，修改 `claude-multi-woker/cmw.config` 定义角色
-- [ ] **步骤 2**: 确认已安装 WezTerm (`wezterm --version`)
-- [ ] **步骤 3**: 创建项目根目录 `TASK_PROGRESS.md` 任务追踪文件
-- [ ] **步骤 4**: 在 WezTerm 终端中运行 `cd claude-multi-woker && python run.py`
-- [ ] **步骤 5**: 等待所有实例启动完成（会看到多个标签页）
-- [ ] **步骤 6**: 切换到 coordinator 标签页
-- [ ] **步骤 7**: 在 coordinator 中输入启动提示词（见下方模板）
-- [ ] **步骤 8**: coordinator 确认所有角色已就绪
-- [ ] **步骤 9**: 观察各角色开始协作工作并同步状态
-
-### 6. 标准启动提示词模板
-
-#### 通用项目启动模板
-
-```
-开始项目协作模式
-
-项目名称: [填写项目名称]
-项目类型: [Web应用/CLI工具/库/框架/其他]
-项目描述: [简要描述项目要实现的功能]
-技术栈: [例如: React + Node.js / Python / Go 等]
-
-角色配置:
-- coordinator (我): 项目协调员，负责任务分配和进度跟踪
-- architect: 架构师，负责系统设计
-- coder: 开发工程师，负责代码实现
-- test: 测试工程师，负责质量验证
-- auditor: 审计员（按需启动），负责项目审计提示
-
-工作流程:
-1. 我将向 architect 发送架构设计任务
-2. architect 完成后，向 coder 分配开发任务
-3. coder 完成后，要求 test 进行测试
-4. test 通过后，我进行最终验收
-5. 验收通过后，提示用户启动 auditor 进行项目审计
-
-现在开始执行，请向 architect 发送架构设计任务。
-```
-
-#### Web 应用项目模板
-
-```
-开始 Web 应用项目协作
-
-项目名称: [项目名称]
-项目类型: Web 应用
-前端技术: [例如: React/Vue/Next.js]
-后端技术: [例如: Node.js/Python/Go]
-数据库: [例如: PostgreSQL/MongoDB]
-
-核心功能:
-1. [功能1]
-2. [功能2]
-3. [功能3]
-
-角色配置:
-- coordinator (我): 项目协调员
-- architect: 全栈架构师
-- frontend: 前端开发
-- backend: 后端开发
-- test: 测试工程师
-
-请开始协调: 先向 architect 发送架构设计任务，包含前后端分离方案和 API 设计。
-```
-
-#### CLI 工具项目模板
-
-```
-开始 CLI 工具项目协作
-
-项目名称: [工具名称]
-项目类型: CLI 命令行工具
-主要功能: [工具的核心用途]
-开发语言: [Python/Go/Rust 等]
-
-角色配置:
-- coordinator (我): 需求分析与协调
-- architect: CLI 架构设计
-- coder: 核心功能开发
-- test: 测试与文档
-
-请开始: 向 architect 发送 CLI 结构和命令设计任务。
-```
-
-#### 库/框架项目模板
-
-```
-开始库开发项目协作
-
-项目名称: [库名称]
-项目类型: 开发库/框架
-目标用户: [谁会使用这个库]
-核心 API: [列出主要 API 接口]
-
-角色配置:
-- coordinator (我): API 设计与协调
-- architect: 库架构设计
-- coder: 核心实现
-- docs: 文档编写
-- test: 测试工程师
-
-请开始: 向 architect 发送库的模块设计和 API 规范任务。
-```
-
-### 8. 审计角色工作流程
-
-#### 审计触发时机
-
-当项目开发完成，coordinator 验收通过后，需要启动审计流程：
-
-```bash
-# 1. 在 WezTerm 中手动启动 auditor 标签页
-#（或者将 cmw.config 中 auditor 的 autostart 改为 true 后重新运行 python run.py）
-
-# 2. 切换到 coordinator 标签页，发送消息
-python send auditor "项目开发已完成，请提示用户进行项目审计"
-
-# 3. 切换到 auditor 标签页，查看审计提示
-```
-
-#### 审计提示词模板
-
-auditor 角色在收到审计请求后，应使用以下模板提示用户：
-
-```
-🔍 项目审计提示
-
-项目已完成开发和测试，现进入审计阶段。
-
-项目信息:
-- 项目名称: [从 coordinator 获取]
-- 项目类型: [Web应用/CLI工具/库等]
-- 技术栈: [项目使用的技术]
-- 完成状态: ✅ 开发完成 ✅ 测试通过
-
-建议审计维度:
-
-1️⃣ 代码质量审计
-   使用工具: Claude Code, GitHub Copilot, Codex
-   审计内容:
-   - 代码规范性检查
-   - 安全漏洞扫描
-   - 性能优化建议
-   - 代码复杂度分析
-
-2️⃣ 架构设计审计
-   使用工具: Claude Opus, Gemini
-   审计内容:
-   - 架构合理性评估
-   - 扩展性和可维护性
-   - 技术选型合理性
-   - 设计模式应用
-
-3️⃣ 文档完整性审计
-   使用工具: Claude, ChatGPT
-   审计内容:
-   - API 文档完整性
-   - 用户文档清晰度
-   - 代码注释充分性
-   - README 规范性
-
-4️⃣ 安全性审计
-   使用工具: 专用安全扫描工具 + AI 辅助
-   审计内容:
-   - 依赖包安全性
-   - 输入验证和输出编码
-   - 认证授权机制
-   - 敏感数据处理
-
-5️⃣ 测试覆盖率审计
-   使用工具: 测试工具 + AI 分析
-   审计内容:
-   - 单元测试覆盖率
-   - 集成测试完整性
-   - 边界情况测试
-   - 错误处理测试
-
-执行步骤:
-
-步骤 1: 选择审计维度
-根据项目重要性，选择需要执行的审计维度（建议至少选择 2-3 个）
-
-步骤 2: 使用相应工具进行审计
-按照各个维度的审计内容，使用对应的 AI 工具进行审计
-
-步骤 3: 汇总审计结果
-将各工具的审计结果整理到统一的审计文档中:
-📄 建议创建: docs/AUDIT_REPORT.md
-
-步骤 4: 问题修复与验证
-根据审计结果修复发现的问题，并重新验证
-
-步骤 5: 审计结论
-形成最终审计结论，决定是否可以发布
-
-审计文档模板:
-
-# 项目审计报告
-
-## 审计概要
-- 审计时间: [日期]
-- 审计人: [用户名称]
-- 审计工具: [使用的工具列表]
-
-## 审计结果
-
-### 代码质量审计
-- 发现问题: [列出问题]
-- 风险等级: [高/中/低]
-- 修复建议: [具体建议]
-
-### 架构设计审计
-- 评估结果: [通过/需改进]
-- 改进建议: [具体建议]
-
-### 文档完整性审计
-- 完整性评分: [分数或评价]
-- 缺失内容: [列出缺失部分]
-
-### 安全性审计
-- 安全风险: [列出风险点]
-- 修复方案: [具体方案]
-
-### 测试覆盖率审计
-- 覆盖率: [具体百分比]
-- 测试缺口: [未覆盖的部分]
-
-## 总结与建议
-[整体评估和发布建议]
+**Note**: `auditor` role is set to `autostart: false`, only started when project audit is needed.
+
+#### Role Responsibilities
+
+- **coordinator**: Overall responsibility, task allocation, progress coordination, result acceptance
+- **architect**: Design system architecture, technical solutions, directory structure
+- **coder**: Implement specific features, write business code
+- **test**: Write tests, validate features, report issues
+- **auditor**: After project completion, prompt user for multi-perspective audit, compile audit documentation
+
+Expand other roles as needed:
+- `ui` - UI/UX Designer
+- `frontend` - Frontend Developer
+- `backend` - Backend Developer
+- `devops` - DevOps Engineer
+- `docs` - Documentation Writer
 
 ---
 
-请根据实际情况选择审计维度和工具，完成审计后请告知结果。
-```
+### 2. Start Multi-Instance System
 
-#### 审计完成后的处理
+#### Step 1: Open WezTerm Terminal
 
-用户完成审计后，应向 coordinator 汇报：
+**Important**: Must run in **WezTerm** terminal, no other terminals supported!
+
+- Check if WezTerm is installed: `wezterm --version`
+- If not installed, visit: https://wezterm.org/index.html
+
+#### Step 2: Launch Multi-Instance
 
 ```bash
-# 在 auditor 标签页
-python send coordinator "审计已完成，审计报告在 docs/AUDIT_REPORT.md，共发现 X 个问题，其中高风险 Y 个，建议 [通过/修改后发布/暂不发布]"
+cd claude-multi-woker
+python run.py
 ```
 
-### 7. 强制执行规则
+The system will automatically:
+- Start all instances with `autostart: true`
+- Create independent WezTerm tabs for each instance
+- Generate instance mapping to `.cmw_config/tab_mapping.json`
 
-#### 规则 1: 先配置后开发
+#### Step 3: Start Project in Coordinator Role
 
-在任何项目开始前，必须：
-
-1. 根据项目需求定义角色（修改 `cmw.config`）
-2. 启动多实例系统（`python run.py`）
-3. 在 coordinator 角色中分配任务
-
-#### 规则 2: 角色职责分离
-
-- 不同角色不得越权操作
-- coder 角色不应修改架构设计
-- architect 角色不应直接写业务代码
-- 每个角色专注于自己的职责
-
-#### 规则 3: 通信可追溯
-
-- 所有的任务分配必须通过 `send` 命令
-- 重要的决策和变更必须通知相关角色
-- 完成工作后必须向下一角色发送明确的移交消息
-
-#### 规则 4: 强制测试验收流程（Critical）⚠️⚠️⚠️
-
-**这是强制规则，违反将导致任务无效。每个开发任务完成后必须经过测试验证，由 coordinator 统一调度。**
-
-**为什么由 coordinator 调度而不是 coder 直接通知 test？**
-
-- ✅ coordinator 上下文更少，更不容易忘记测试环节
-- ✅ 保持中央调度的统一性和可追溯性
-- ✅ 便于任务状态跟踪和 TASK_PROGRESS.md 的统一管理
-- ✅ coder 可能因上下文过长而忘记通知测试
-
-**强制流程**：
+Switch to **coordinator** tab and enter the following startup prompt:
 
 ```
-① coder 完成开发
+Start project collaboration mode
+
+Project name: [project name]
+Project type: [Web app / CLI tool / Library / Other]
+Project goal: [Brief description]
+
+Role configuration:
+- coordinator (me): Project Coordinator
+- architect: Architect
+- coder: Developer
+- test: Test Engineer
+
+Please start coordinating the project:
+1. Send architecture design task to architect
+2. After architect completes, assign development tasks to coder
+3. After coder completes, require test to perform testing
+4. After test passes, conduct final acceptance
+
+Now send the first task message to architect.
+```
+
+The system will automatically start the collaboration process.
+
+---
+
+### 3. Role Communication Mechanism
+
+#### Communication Command Format
+
+```bash
+# Basic format
+python send <role-id> "message content"
+
+# Examples
+python send coder "Please implement user login feature"
+python send test "Login feature completed, please test"
+```
+
+#### Communication Standards
+
+**Message Format Requirements**:
+- Clear sender: Message should start with "I am XXX role"
+- Clear task description: What needs to be done, why, expected results
+- Context information: Include necessary file paths, dependencies, prerequisites
+
+**Standard Message Template**:
+
+```
+[Role Communication Template]
+
+I am [sender role]
+
+Task: [Specific task to do]
+Background: [Why this task is needed]
+Requirements: [Specific acceptance criteria]
+Related files: [Files or directories involved]
+Dependencies: [Prerequisites or dependencies on other roles' work]
+
+Please confirm receipt and start work.
+```
+
+---
+
+### 4. Mandatory Testing Workflow ⭐⭐⭐
+
+**Every development task completion must be tested and validated, coordinated uniformly by coordinator.**
+
+#### Why Coordinator Schedules Instead of Coder Directly Notifying Test?
+- ✅ Coordinator has less context, less likely to forget testing phase
+- ✅ Maintains central scheduling consistency
+- ✅ Facilitates task status tracking and TASK_PROGRESS.md unified management
+- ✅ Coder may forget to notify testing due to long context
+
+#### Mandatory Flow:
+
+```
+① coder completes development
     ↓
-② coder 必须通知 coordinator（不直接通知 test）
-    python send coordinator "任务X已完成，产出：[file list]，请安排测试"
+② coder must notify coordinator (not test directly)
+    python send coordinator "Task X completed, output: [file list], please arrange testing"
     ↓
-③ coordinator 必须立即（5分钟内）分配 test 任务
-    python send test "请测试任务X，内容：[desc]，文件：[files]"
-    更新 TASK_PROGRESS.md 状态为 "🧪 待测试"
+③ coordinator must immediately (within 5 minutes) assign test task
+    python send test "Please test Task X, content: [desc], files: [files]"
+    Update TASK_PROGRESS.md status to "🧪 Testing"
     ↓
-④ test 执行测试验证
+④ test executes testing
     ↓
-⑤ test 向 coordinator 汇报结果
-    python send coordinator "任务X测试[pass/fail]，报告：[details]"
+⑤ test reports result to coordinator
+    python send coordinator "Task X test [pass/fail], report: [details]"
     ↓
-⑥ coordinator 验收决策
-    通过 → 更新 TASK_PROGRESS.md 为 ✅ 完成，分配下一任务
-    失败 → python send coder "测试发现问题：[issues]，请修复"
-          → coder 修复后重复步骤②
+⑥ coordinator makes decision
+    Pass → Update TASK_PROGRESS.md to ✅ Complete, assign next task
+    Fail → python send coder "Test found issues: [issues], please fix"
+          → coder fixes and repeats step ②
 ```
 
-**禁止行为**：
+**Forbidden Actions**:
+- ❌ coder directly `send test` (bypassing coordinator)
+- ❌ coder marks task complete on their own
+- ❌ coordinator forgets to assign test validation
+- ❌ test validates without marking complete
 
-- ❌ coder 直接 `send test` （跳过 coordinator）
-- ❌ coder 自行标记任务完成
-- ❌ coordinator 忘记分配 test 验收
-- ❌ test 未验证就标记完成
+**Violation Consequences**:
+- Task invalid, must retest
+- Quality cannot be guaranteed, may introduce bugs
+- Task status chaotic, cannot trace
 
-**违规后果**：
+---
 
-- 任务无效，必须重新测试
-- 质量无法保证，可能引入bug
-- 任务状态混乱，无法追溯
+### 5. State Synchronization System
 
-#### 规则 5: 状态同步强制要求 ⚠️
+#### ⚠️ Mandatory State Sync Mechanism
 
-**违反以下任何一条将导致任务丢失风险**：
+**To prevent context loss and task omission, all roles must follow these mandatory rules**:
 
-- ✅ **任务确认**: 接收任务必须回复确认
-- ✅ **状态更新**: 每个状态变更必须写入 `TASK_PROGRESS.md`
-- ✅ **进度汇报**: 每完成一个里程碑必须向 coordinator 汇报
-- ✅ **上下文保护**: context usage > 60% 时必须清理并恢复
-- ✅ **移交检查**: 任务移交前必须完成检查清单
-- ✅ **超时检测**: coordinator 每 10 分钟检查任务状态
-
-**违规后果**：
-
-- 任务可能丢失或重复执行
-- 无法追溯问题根源
-- 项目进度无法准确评估
-- 团队协作混乱
-
-#### 规则 6: 上下文管理强制要求
-
-- ❌ **禁止**: 单个对话超过 context usage 的 60%
-- ✅ **必须**: 定期使用 `/clear` 并从 `TASK_PROGRESS.md` 恢复
-- ✅ **必须**: 重要决策写入 `memory-bank/` 永久保存
-- ✅ **必须**: 角色切换前保存当前状态到文件
-
-**强制恢复流程**：
+##### Rule 1: Task Confirmation Mechanism (Mandatory)
 
 ```bash
-# 当上下文即将溢出时
-1. 将当前进度写入 TASK_PROGRESS.md
-2. 将关键决策写入 memory-bank/
-3. 使用 /clear 清空对话
-4. 读取 TASK_PROGRESS.md 恢复工作状态
+# Must reply confirmation when receiving task
+✅ Correct example:
+python send coordinator "Task received, starting user authentication system architecture design"
+
+❌ Wrong approach:
+- Only receive task without replying
+- Assume other party received message
 ```
 
-#### 规则 7: 交互式需求收集强制要求 ⚠️
+##### Rule 2: Task Status Tracking File (Mandatory)
 
-**在收集用户需求、偏好、选择时，必须使用交互式方式**：
+**Project root must maintain** `TASK_PROGRESS.md`:
 
-- ❌ **禁止**: 用文本列出问题让用户手动回答
-- ✅ **必须**: 使用 `AskUserQuestion` 工具让用户通过勾选/选择
-- ✅ **适用场景**:
-  - 项目启动时收集需求
-  - 功能选择（多选）
-  - 技术栈选型
-  - 架构方案选择
-  - 任何需要用户偏好/选择的场景
+```markdown
+# Task Progress Tracking
 
-**违规后果**：
+> This file is maintained by coordinator, all roles must sync in real-time
 
-- 用户体验差
-- 需求收集不完整
-- 增加沟通成本
-- 违反用户体验最佳实践
+## Task List
 
-#### 规则 8: 通用任务完成强制流程（所有角色） ⚠️⚠️⚠️
+| ID | Description | Assigned To | Status | Assigned | Completed | Notes |
+|----|-------------|-------------|--------|----------|-----------|-------|
+| 1 | Design user auth system | architect | ✅ Complete | T1 | T2 | Docs in docs/arch.md |
+| 2 | Implement login feature | coder | 🔄 In Progress | T2 | - | Est. T4 completion |
+| 3 | Write test cases | test | ⏳ Pending | - | - | Depends on task 2 |
 
-**🚨 最高优先级规则：所有角色（包括未来新增角色）必须遵守**
+## Status Legend
+- ⏳ Pending
+- 🔄 In Progress  
+- 🧪 Testing (coder tasks only - dev done, awaiting test validation)
+- ⏸️ Blocked
+- ✅ Complete
+- ❌ Cancelled
 
-当角色完成任务时，**必须**按以下步骤操作：
+## Latest Updates
+- T3: coder started login feature implementation
+- T2: architect completed architecture design
+```
 
-##### 步骤 1: 更新 TASK_PROGRESS.md
+**Mandatory Requirements**:
+- **coordinator** must update this file when assigning tasks
+- **Executing roles** must sync status when starting/completing
+- **Every status change must notify coordinator**
+
+---
+
+### 6. Standard Startup Prompt Template
+
+#### General Project Startup Template
+
+```
+Start project collaboration mode
+
+Project name: [Fill in project name]
+Project type: [Web app / CLI tool / Library / Framework / Other]
+Project description: [Brief description of features to implement]
+Tech stack: [e.g., React + Node.js / Python / Go, etc.]
+
+Role configuration:
+- coordinator (me): Project coordinator, responsible for task allocation and progress tracking
+- architect: Architect, responsible for system design
+- coder: Developer, responsible for code implementation
+- test: Test engineer, responsible for quality validation
+- auditor: Auditor (on-demand startup), responsible for project audit prompts
+
+Workflow:
+1. I will send architecture design task to architect
+2. After architect completes, assign development tasks to coder
+3. After coder completes, require test to perform testing
+4. After test passes, conduct final acceptance
+5. After acceptance passes, prompt user to start auditor for project audit
+
+Now start execution, send architecture design task to architect.
+```
+
+---
+
+### 7. Quick Reference Card
+
+#### Minimum Startup Process
 
 ```bash
-# 所有角色在完成任务前，必须先更新 TASK_PROGRESS.md
-# 将自己的任务状态从 "🔄 进行中" 改为 "✅ 完成"
-```
-
-##### 步骤 2: 通知 coordinator（强制性）
-
-```bash
-# 使用 python send 命令通知 coordinator
-python send coordinator "我是 [角色名]
-
-任务 [任务ID] 已完成: [任务描述]
-产出文件: [列出创建/修改的文件路径]
-完成时间: [时间戳]
-
-请更新任务状态并分配下一任务。"
-```
-
-##### 步骤 3: 清理上下文（强制性）
-
-```bash
-# ⚠️ 任务完成后必须清理上下文，防止下次任务时上下文溢出
-
-# 1. 使用 /clear 清空对话
-/clear
-
-# 2. 恢复时读取 TASK_PROGRESS.md
-"请读取 TASK_PROGRESS.md，我是 [角色名]，等待新任务分配"
-```
-
-##### 标准完成消息模板
-
-**所有角色必须使用以下模板**：
-
-```bash
-# ========== 任务完成通知模板 ==========
-python send coordinator "我是 [角色名]
-
-✅ 任务完成报告:
-
-任务ID: [从 TASK_PROGRESS.md 读取]
-任务描述: [简短描述]
-完成时间: [当前时间]
-
-📁 产出文件:
-- [文件1路径]
-- [文件2路径]
-- ...
-
-📝 完成说明:
-[简要说明做了什么，遇到什么问题，如何解决]
-
-⚠️ 上下文已清理: 是
-等待状态: 等待下一任务分配
-
-请 coordinator 更新 TASK_PROGRESS.md 并分配下一任务。"
-# ========================================
-```
-
-##### 违规后果
-
-**不遵守此规则将导致**：
-
-- ❌ 协作流程卡死（coordinator 不知道任务已完成）
-- ❌ 上下文溢出（导致下次任务性能下降）
-- ❌ 任务状态不同步（TASK_PROGRESS.md 信息不准确）
-- ❌ 项目进度无法追踪（用户无法了解真实进度）
-
-##### 适用范围
-
-**此规则适用于**：
-
-- ✅ architect（架构师）
-- ✅ coder（开发工程师）
-- ✅ test（测试工程师）
-- ✅ docs（文档编写员）
-- ✅ ui（UI设计师）
-- ✅ frontend（前端开发）
-- ✅ backend（后端开发）
-- ✅ **所有未来新增的角色**
-
-##### 完整工作流示例
-
-```bash
-# T1: coordinator 分配任务给 architect
-python send architect "设计系统架构..."
-
-# T2: architect 收到任务（必须确认）
-python send coordinator "我是 architect，收到任务，开始执行..."
-
-# T3: architect 完成任务
-# 3.1 更新 TASK_PROGRESS.md（状态改为 ✅ 完成）
-# 3.2 通知 coordinator
-python send coordinator "我是 architect
-✅ 任务 1 已完成: 系统架构设计
-产出文件: memory-bank/architecture.md
-完成时间: T3
-请更新任务状态并分配下一任务。"
-
-# 3.3 清理上下文
-/clear
-
-# T4: coordinator 收到完成通知，更新 TASK_PROGRESS.md，分配下一任务
-python send coder "实现用户登录功能..."
-
-# T5: coder 收到任务，确认，完成，通知，清理...（循环）
-```
-
-##### 特殊情况处理
-
-**如果任务被阻塞**：
-
-```bash
-python send coordinator "我是 [角色名]
-
-⚠️ 任务阻塞报告:
-
-任务ID: [任务ID]
-阻塞原因: [详细描述]
-需要协调: [需要谁的帮助]
-
-建议解决方案:
-[可选：提供1-2个解决方案]
-
-等待 coordinator 协调解决。"
-```
-
-**如果任务需要拆分**：
-
-```bash
-python send coordinator "我是 [角色名]
-
-📊 任务拆分建议:
-
-原任务: [任务ID]
-拆分原因: [为什么需要拆分]
-
-建议拆分为:
-- 子任务 A: [描述]
-- 子任务 B: [描述]
-
-请确认并更新 TASK_PROGRESS.md。"
-```
-
-## 项目类型与角色配置
-
-### Web 应用项目
-
-```json
-{
-  "instances": [
-    { "id": "coordinator", "role": "项目协调员", "autostart": true },
-    { "id": "architect", "role": "系统架构师", "autostart": true },
-    { "id": "frontend", "role": "前端开发", "autostart": true },
-    { "id": "backend", "role": "后端开发", "autostart": true },
-    { "id": "test", "role": "测试工程师", "autostart": true },
-    { "id": "auditor", "role": "项目审计员", "autostart": false }
-  ]
-}
-```
-
-### 库/框架开发项目
-
-```json
-{
-  "instances": [
-    { "id": "coordinator", "role": "项目协调员", "autostart": true },
-    { "id": "architect", "role": "API 设计师", "autostart": true },
-    { "id": "coder", "role": "核心开发者", "autostart": true },
-    { "id": "docs", "role": "文档编写员", "autostart": true },
-    { "id": "test", "role": "测试工程师", "autostart": true },
-    { "id": "auditor", "role": "项目审计员", "autostart": false }
-  ]
-}
-```
-
-### 简单脚本/工具项目
-
-```json
-{
-  "instances": [
-    { "id": "coordinator", "role": "需求分析与开发", "autostart": true },
-    { "id": "coder", "role": "代码实现", "autostart": true },
-    { "id": "test", "role": "测试验证", "autostart": true },
-    { "id": "auditor", "role": "项目审计员", "autostart": false }
-  ]
-}
-```
-
-## 快速参考卡
-
-### 最小化启动流程
-
-```bash
-# 1. 配置角色（编辑 cmw.config）
+# 1. Configure roles (edit cmw.config)
 vim claude-multi-woker/cmw.config
 
-# 2. 在 WezTerm 中启动
+# 2. Launch in WezTerm
 cd claude-multi-woker
 python run.py
 
-# 3. 在 coordinator 标签页输入启动提示词
+# 3. Enter startup prompt in coordinator tab
 ```
 
-### 常用通信命令
+#### Common Communication Commands
 
 ```bash
-# 查看帮助
+# View help
 python send
 
-# 发送消息
-python send <角色> "消息内容"
+# Send message
+python send <role> "message content"
 
-# 示例
-python send architect "设计用户认证系统"
-python send coder "实现登录功能"
-python send test "测试登录流程"
-python send coordinator "功能已完成，请验收"
-python send auditor "项目已完成，请提示用户进行审计"
+# Examples
+python send architect "Design user authentication system"
+python send coder "Implement login feature"
+python send test "Test login process"
+python send coordinator "Feature completed, please review"
 ```
 
-### 角色简写
+#### State Sync Commands (Important)
 
 ```bash
-# 支持使用 c1, c2, c3... 代替角色名
-python send c1 "消息"  # 第一个实例
-python send c2 "消息"  # 第二个实例
-python send c3 "消息"  # 第三个实例
+# Task confirmation (immediately reply after receiving task)
+python send coordinator "Task [ID] received, starting execution"
+
+# Progress report (every milestone completion)
+python send coordinator "Progress update: Task [ID] 50% complete"
+
+# Task completion (notify when done)
+python send coordinator "Task [ID] completed, output: [file path]"
+
+# Block report (when encountering issues)
+python send coordinator "Block report: Task [ID] blocked, reason: [description]"
 ```
 
-### 审计流程
+---
 
-```bash
-# 1. 项目完成后，coordinator 发送审计请求
-python send auditor "项目开发已完成，请提示用户进行项目审计"
+## Version History
 
-# 2. 用户根据 auditor 提示使用多个 AI 工具进行审计
-
-# 3. 完成审计后，auditor 向 coordinator 汇报
-python send coordinator "审计已完成，审计报告在 docs/AUDIT_REPORT.md"
-```
-
-### 状态同步命令（重要）
-
-```bash
-# 任务确认（接收任务后立即回复）
-python send coordinator "收到任务 [ID]，开始执行"
-
-# 进度汇报（每完成一个里程碑）
-python send coordinator "进度更新: 任务 [ID] 已完成 50%"
-
-# 任务完成（完成时通知）
-python send coordinator "任务 [ID] 已完成，产出: [文件路径]"
-
-# 阻塞报告（遇到问题时）
-python send coordinator "阻塞报告: 任务 [ID] 被阻塞，原因: [描述]"
-
-# 上下文恢复（清理后恢复状态）
-"读取 TASK_PROGRESS.md，当前任务: [ID]，状态: [进行中/已完成]"
-
-# 超时检测（coordinator 定期执行）
-python send coordinator "检查任务状态: 读取 TASK_PROGRESS.md 确认所有任务进度"
-```
-
-### TASK_PROGRESS.md 更新时机
-
-```bash
-# 必须更新 TASK_PROGRESS.md 的时机：
-1. coordinator 分配任务时
-2. 角色接收任务确认时
-3. 任务状态变更时（待开始→进行中→完成）
-4. 完成里程碑时
-5. 遇到阻塞时
-6. 上下文清理前（保存当前状态）
-```
-
-### 上下文保护流程
-
-```bash
-# 当 context usage > 60% 时强制执行：
-
-# 步骤 1: 保存状态
-echo "更新 TASK_PROGRESS.md 记录当前进度"
-
-# 步骤 2: 保存关键决策
-echo "将重要决策写入 memory-bank/ 目录"
-
-# 步骤 3: 清理上下文
-/clear
-
-# 步骤 4: 恢复状态
-"请读取 TASK_PROGRESS.md 和 memory-bank/ 目录，恢复我的工作状态"
-```
-
-## 注意事项
-
-1. **消息编码**: 目前 MCP 工具对中文支持有限，发送中文消息请使用命令行方式
-2. **映射文件**: 每次启动后 `tab_mapping.json` 会重新生成，确保使用最新的映射
-3. **实例数量**: 建议使用 3-5 个角色，过多会导致协作效率下降
-4. **角色命名**: 使用小写英文，简短明确，便于输入命令
-
-## 故障排除
-
-### 消息发送失败
-
-- 检查是否在 WezTerm 中运行了 `python run.py`
-- 确认 `.cmw_config/tab_mapping.json` 文件存在
-- 验证角色 ID 是否正确（区分大小写）
-
-### 实例无响应
-
-- 使用 `Ctrl+C` 退出无响应的实例
-- 重新运行 `python run.py` 启动系统
-
-## 版本历史
-
-- v1.4 (2025-01-30):
-  - 🔒 **核心更新**: 添加交互式需求收集强制规则（规则 7）
-  - 强制要求使用 AskUserQuestion 工具收集用户需求
-  - 禁止用文本列出问题让用户手动回答
-  - 更新 CLAUDE.md 添加交互式需求收集规则
-  - 更新 COORDINATOR_INSTRUCTIONS.md 添加交互式需求收集指引
+- v1.4 (2026-01-30):
+  - 🔒 **Core Update**: Added mandatory testing workflow
+  - Mandatory: coder completes → notify coordinator → coordinator assigns test
+  - Added "🧪 Testing" status
+  - Forbidden: coder directly notifying test, bypassing coordinator
+  - coordinator must assign test within 5 minutes
+  - Only mark complete after test validation passes
 - v1.3 (2025-01-30):
-  - 🔒 **核心更新**: 添加强制性状态同步机制
-  - 添加 TASK_PROGRESS.md 任务追踪系统
-  - 添加任务确认机制（防止任务丢失）
-  - 添加定期心跳汇报机制
-  - 添加上下文保护机制（防止溢出）
-  - 添加超时检测与恢复机制
-  - 添加任务移交检查清单
-  - 更新强制执行规则（规则 5、规则 6）
-  - 添加状态同步工作流示例
-  - 添加快速参考卡中的状态同步命令
+  - 🔒 **Core Update**: Added mandatory state synchronization mechanism
+  - Added TASK_PROGRESS.md task tracking system
+  - Added task confirmation mechanism (prevent task loss)
+  - Added regular heartbeat reporting mechanism
+  - Added context protection mechanism (prevent overflow)
+  - Added timeout detection and recovery mechanism
+  - Added task handover checklist
 - v1.2 (2025-01-30):
-  - 添加 auditor（审计员）角色
-  - 添加审计工作流程和提示词模板
-  - 更新所有角色配置包含 auditor
-  - 添加审计维度说明（代码质量/架构/文档/安全/测试）
-  - 添加审计文档模板
+  - Added auditor role
+  - Added audit workflow and prompt templates
 - v1.1 (2025-01-30):
-  - 添加 WezTerm 启动检查步骤
-  - 添加标准启动提示词模板（通用/Web应用/CLI工具/库开发）
-  - 添加启动检查清单
-  - 添加快速参考卡
-- v1.0 (2025-01-30): 初始版本，定义基本协作规范
+  - Added WezTerm startup check steps
+  - Added standard startup prompt templates
+- v1.0 (2025-01-30): Initial version, defined basic collaboration guidelines
+
+---
+
+**For complete Chinese version and detailed workflow examples, see**: [docs/cn/MULTI_WORKER_RULES.md](docs/cn/MULTI_WORKER_RULES.md)
+
+**Quick Reference**: [QUICK_REFERENCE.md](QUICK_REFERENCE.md)
+
+**Last Updated**: January 30, 2026  
+**Version**: v1.4
