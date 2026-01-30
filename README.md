@@ -6,6 +6,8 @@
 [![Claude](https://img.shields.io/badge/Claude-Code-orange)](https://claude.ai/code)
 [![Vibe Coding](https://img.shields.io/badge/Vibe_Coding-v1.2.2-blue)](https://github.com/EnzeD/vibe-coding)
 
+**Language**: [English](README.md) | [中文](docs/cn/README.md)
+
 ---
 
 ## 📖 Overview

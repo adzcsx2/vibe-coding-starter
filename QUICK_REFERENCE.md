@@ -1,257 +1,259 @@
-﻿# 多角色协作快速参考卡
+﻿# Multi-Role Collaboration Quick Reference
 
-> **速查**: 最关键的规则和命令
+> **Quick Guide**: Most Critical Rules and Commands
 
----
-
-## 🚨 最重要的规则（必须遵守）
-
-### 1. 强制测试流程 ⭐⭐⭐
-
-```
-❌ 禁止: coder 直接 send test
-❌ 禁止: coder 自行标记任务完成
-✅ 正确: coder → coordinator → test → coordinator → 完成
-
-流程:
-① coder 完成 → send coordinator "任务X完成，请安排测试"
-② coordinator → send test "请测试任务X..." + 更新状态为 "🔄 待测试"
-③ test 完成 → send coordinator "测试结果：[pass/fail]"
-④ coordinator 决策 → 通过则标记 "✅ 完成"
-```
-
-### 2. Coordinator 职责
-
-```
-✅ 你负责: 任务分配、进度跟踪、质量把控
-❌ 你不做: 编写代码、创建文件
-
-收到 coder 完成通知后，必须：
-1. 更新状态为 "🔄 待测试"
-2. 立即（5分钟内）分配 test 验证
-3. 等待 test 验收通过后才标记 "✅ 完成"
-```
-
-### 3. "继续"命令处理
-
-```
-用户说"继续"时，立即执行：
-1. 读取 TASK_PROGRESS.md
-2. 检查是否存在:
-   - 存在 → 恢复项目状态，汇报当前进度
-   - 不存在 → 启动新项目流程
-3. 根据状态继续工作
-```
+**Language**: [English](QUICK_REFERENCE.md) | [中文](docs/cn/QUICK_REFERENCE.md)
 
 ---
 
-## 📋 任务状态图
+## 🚨 Most Important Rules (Must Follow)
+
+### 1. Mandatory Testing Workflow ⭐⭐⭐
 
 ```
-⏳ 待开始
-    ↓ (分配任务)
-🔄 进行中
-    ↓ (完成开发)
-🔄 待测试 ⭐ (coder 任务专用)
-    ↓ (test 验收)
-    ├─ 通过 → ✅ 已完成
-    └─ 失败 → 🔄 进行中 (修复)
+❌ Forbidden: coder directly sends to test
+❌ Forbidden: coder marks task as complete on their own
+✅ Correct: coder → coordinator → test → coordinator → complete
+
+Workflow:
+① coder completes → send coordinator "Task X complete, please arrange testing"
+② coordinator → send test "Please test Task X..." + update status to "🔄 Testing"
+③ test completes → send coordinator "Test result: [pass/fail]"
+④ coordinator decides → if passed, mark as "✅ Complete"
+```
+
+### 2. Coordinator Responsibilities
+
+```
+✅ Your role: Task allocation, progress tracking, quality control
+❌ You don't: Write code, create files
+
+When receiving coder completion notice, you must:
+1. Update status to "🔄 Testing"
+2. Immediately (within 5 minutes) assign test validation
+3. Only mark as "✅ Complete" after test passes
+```
+
+### 3. "Continue" Command Handling
+
+```
+When user says "continue", immediately:
+1. Read TASK_PROGRESS.md
+2. Check if exists:
+   - Exists → Restore project status, report current progress
+   - Not exists → Start new project workflow
+3. Continue work based on status
 ```
 
 ---
 
-## 💬 标准命令模板
+## 📋 Task Status Diagram
 
-### Coordinator 分配任务
+```
+⏳ Pending
+    ↓ (assign task)
+🔄 In Progress
+    ↓ (complete development)
+🔄 Testing ⭐ (coder tasks only)
+    ↓ (test validation)
+    ├─ Pass → ✅ Complete
+    └─ Fail → 🔄 In Progress (fixing)
+```
+
+---
+
+## 💬 Standard Command Templates
+
+### Coordinator Assigns Tasks
 
 ```bash
-# 分配给 architect
-python send architect "任务：设计系统架构
+# Assign to architect
+python send architect "Task: Design system architecture
 
-项目：[项目名称]
-需求：[具体需求]
+Project: [project name]
+Requirements: [specific requirements]
 
-请完成后向我汇报。"
+Please report back when complete."
 
-# 分配给 coder
-python send coder "任务：实现登录功能
+# Assign to coder
+python send coder "Task: Implement login feature
 
-背景：architect 已完成架构设计
-要求：[具体要求]
-文档：见 memory-bank/architecture.md
+Background: architect has completed design
+Requirements: [specific requirements]
+Docs: see memory-bank/architecture.md
 
-完成后请通知我安排测试验收。"
+Please notify me when complete to arrange testing."
 
-# 分配给 test（收到 coder 完成通知后）
-python send test "任务：验收登录功能
+# Assign to test (after receiving coder completion notice)
+python send test "Task: Validate login feature
 
-开发已完成，请验证：
-- 功能是否正常
-- 代码质量
-- 是否有bug
+Development complete, please verify:
+- Functionality works correctly
+- Code quality
+- Any bugs
 
-完成后向我汇报测试结果。"
+Report test results to me when done."
 ```
 
-### 角色完成汇报
+### Role Completion Reports
 
 ```bash
-# Architect 完成
-python send coordinator "任务1已完成：系统架构设计
-产出：memory-bank/architecture.md
-请分配下一任务。"
+# Architect completes
+python send coordinator "Task 1 complete: System architecture design
+Output: memory-bank/architecture.md
+Please assign next task."
 
-# Coder 完成
-python send coordinator "任务2已完成：登录功能实现
-产出：src/auth/login.py, src/auth/utils.py
-请安排 test 验收。"
+# Coder completes
+python send coordinator "Task 2 complete: Login feature implementation
+Output: src/auth/login.py, src/auth/utils.py
+Please arrange test validation."
 
-# Test 完成
-python send coordinator "任务2测试完成
-结果：✅ 通过
-覆盖率：95%
-建议标记为完成。"
+# Test completes
+python send coordinator "Task 2 testing complete
+Result: ✅ Passed
+Coverage: 95%
+Recommend marking as complete."
 ```
 
 ---
 
-## 🔄 Coordinator 响应模板
+## 🔄 Coordinator Response Templates
 
-### 收到 coder 完成通知
+### Receiving Coder Completion Notice
 
 ```bash
-# 步骤 1: 确认收到
-"收到 coder 完成通知，正在验证..."
+# Step 1: Acknowledge receipt
+"Received coder completion notice, verifying..."
 
-# 步骤 2: 检查文件
-"产出文件验证：✅"
+# Step 2: Check files
+"Output file verification: ✅"
 
-# 步骤 3: 更新状态
-"更新 TASK_PROGRESS.md: 任务2 → 🔄 待测试"
+# Step 3: Update status
+"Update TASK_PROGRESS.md: Task 2 → 🔄 Testing"
 
-# 步骤 4: 分配 test
-python send test "任务：验收任务2
+# Step 4: Assign test
+python send test "Task: Validate Task 2
 
-coder 已完成开发，请验证：
-- [具体验收要求]
+Coder has completed development, please verify:
+- [specific validation requirements]
 
-完成后向我汇报。"
+Report back when done."
 
-# 步骤 5: 确认给 coder
-python send coder "确认收到！任务2已标记为待测试。
-已分配 test 进行验收。"
+# Step 5: Confirm to coder
+python send coder "Acknowledged! Task 2 marked as testing.
+Test has been assigned for validation."
 ```
 
-### 收到 test 验收结果
+### Receiving Test Validation Results
 
 ```bash
-# 如果通过
-"收到 test 验收结果：✅ 通过"
-"更新 TASK_PROGRESS.md: 任务2 → ✅ 完成"
+# If passed
+"Received test validation result: ✅ Passed"
+"Update TASK_PROGRESS.md: Task 2 → ✅ Complete"
 
-python send coder "任务2已通过验收，标记为完成。"
-python send test "感谢验收，任务2已标记完成。"
+python send coder "Task 2 has passed validation, marked complete."
+python send test "Thanks for validation, Task 2 marked complete."
 
-# 如果不通过
-"收到 test 验收结果：❌ 发现问题"
-"更新 TASK_PROGRESS.md: 任务2 → 🔄 进行中(修复)"
+# If failed
+"Received test validation result: ❌ Issues found"
+"Update TASK_PROGRESS.md: Task 2 → 🔄 In Progress (fixing)"
 
-python send coder "任务2验收发现问题：
-[列出问题]
-请修复后重新通知我。"
+python send coder "Task 2 validation found issues:
+[list issues]
+Please fix and notify me again."
 ```
 
 ---
 
-## 📊 TASK_PROGRESS.md 更新时机
+## 📊 TASK_PROGRESS.md Update Timing
 
 ```
-必须更新的时机：
-✅ 分配任务时: ⏳ 待开始 → 🔄 进行中
-✅ Coder 完成时: 🔄 进行中 → 🔄 待测试
-✅ Test 通过时: 🔄 待测试 → ✅ 完成
-✅ Test 失败时: 🔄 待测试 → 🔄 进行中
-✅ 遇到阻塞时: 🔄 进行中 → ⏸️ 已阻塞
-```
-
----
-
-## 🚫 常见错误
-
-| 错误 | 正确做法 |
-|-----|---------|
-| ❌ Coordinator 自己写代码 | ✅ 用 send 分配给 coder |
-| ❌ Coder 直接 send test | ✅ 必须通过 coordinator |
-| ❌ Coder 自行标记完成 | ✅ 通知 coordinator 安排测试 |
-| ❌ Coordinator 忘记分配 test | ✅ 收到 coder 通知后立即分配 |
-| ❌ 未读 TASK_PROGRESS.md 就恢复 | ✅ 先读取文件再继续工作 |
-
----
-
-## 🎯 成功检查清单
-
-### Coordinator 每次响应前检查
-
-- [ ] 已读取最新的 TASK_PROGRESS.md
-- [ ] 已确认当前任务状态
-- [ ] 如果收到 coder 完成通知，已准备分配 test
-- [ ] 已准备好标准回复模板
-- [ ] 确认不会自己编写代码
-
-### Coordinator 分配测试前检查
-
-- [ ] Coder 已确认完成开发
-- [ ] 产出文件已验证存在
-- [ ] TASK_PROGRESS.md 已更新为 "🔄 待测试"
-- [ ] Test 角色在线可用
-- [ ] 已准备详细的验收要求
-
----
-
-## 🔧 故障恢复
-
-### 上下文丢失时
-
-```
-1. 读取 TASK_PROGRESS.md
-2. 查看当前进行中的任务
-3. 读取 memory-bank/ 相关文档
-4. 向用户汇报恢复状态
-5. 继续协调工作
-```
-
-### 发现任务未测试
-
-```
-如果发现 coder 任务标记为 "✅ 完成" 但未经过 test：
-
-1. 立即更新状态为 "🔄 待测试"
-2. 分配 test 验收
-3. 等待验收通过后再标记完成
-4. 记录此问题到 TASK_PROGRESS.md 备注
+Must update when:
+✅ Assigning task: ⏳ Pending → 🔄 In Progress
+✅ Coder completes: 🔄 In Progress → 🔄 Testing
+✅ Test passes: 🔄 Testing → ✅ Complete
+✅ Test fails: 🔄 Testing → 🔄 In Progress
+✅ Blocked: 🔄 In Progress → ⏸️ Blocked
 ```
 
 ---
 
-## 📞 快速命令
+## 🚫 Common Mistakes
+
+| Mistake | Correct Approach |
+|---------|------------------|
+| ❌ Coordinator writes code themselves | ✅ Use send to assign to coder |
+| ❌ Coder directly sends to test | ✅ Must go through coordinator |
+| ❌ Coder marks task complete themselves | ✅ Notify coordinator to arrange testing |
+| ❌ Coordinator forgets to assign test | ✅ Immediately assign after receiving coder notice |
+| ❌ Resume without reading TASK_PROGRESS.md | ✅ Read file first then continue work |
+
+---
+
+## 🎯 Success Checklist
+
+### Coordinator Check Before Each Response
+
+- [ ] Read latest TASK_PROGRESS.md
+- [ ] Confirmed current task status
+- [ ] If received coder completion notice, ready to assign test
+- [ ] Have standard response template ready
+- [ ] Confirm won't write code myself
+
+### Coordinator Check Before Assigning Test
+
+- [ ] Coder has confirmed development complete
+- [ ] Output files verified to exist
+- [ ] TASK_PROGRESS.md updated to "🔄 Testing"
+- [ ] Test role online and available
+- [ ] Detailed validation requirements prepared
+
+---
+
+## 🔧 Fault Recovery
+
+### When Context Lost
+
+```
+1. Read TASK_PROGRESS.md
+2. Check currently in-progress tasks
+3. Read memory-bank/ related docs
+4. Report recovery status to user
+5. Continue coordination work
+```
+
+### If Task Not Tested
+
+```
+If find coder task marked "✅ Complete" but not tested:
+
+1. Immediately update status to "🔄 Testing"
+2. Assign test validation
+3. Wait for validation to pass before marking complete
+4. Log this issue in TASK_PROGRESS.md notes
+```
+
+---
+
+## 📞 Quick Commands
 
 ```bash
-# 查看角色列表
+# View role list
 ls claude-multi-woker/.cmw_config/
 
-# 发送消息
-python send coordinator "消息"
-python send coder "消息"
-python send test "消息"
-python send architect "消息"
+# Send messages
+python send coordinator "message"
+python send coder "message"
+python send test "message"
+python send architect "message"
 
-# 使用简写
-python send c1 "消息"  # 第一个实例
-python send c2 "消息"  # 第二个实例
+# Use abbreviations
+python send c1 "message"  # First instance
+python send c2 "message"  # Second instance
 ```
 
 ---
 
-**记住**: 你是 coordinator，你的职责是 **调度**，不是 **执行**。
+**Remember**: You are coordinator, your responsibility is **scheduling**, not **execution**.
 
-**核心规则**: Coder 完成后 → 必须通过你 → 分配给 test → 验收通过后才能标记完成。
+**Core Rule**: After coder completes → must go through you → assign to test → mark complete only after validation passes.
