@@ -1,86 +1,90 @@
-# 新项目启动指南
+# New Project Startup Guide
 
-## 🚀 开始一个新项目
+**Language**: [English](START_PROJECT.md) | [中文](docs/cn/START_PROJECT.md)
 
-当你想开始一个新项目时，按照以下步骤操作：
+---
 
-### 步骤 1: 创建项目目录
+## 🚀 Starting a New Project
+
+When you want to start a new project, follow these steps:
+
+### Step 1: Create Project Directory
 
 ```bash
-# 在项目根目录创建你的项目文件夹
+# Create your project folder in the root directory
 mkdir my-project
 cd my-project
 ```
 
-### 步骤 2: 启动多角色协作系统
+### Step 2: Start Multi-Role Collaboration System
 
 ```bash
-# 回到 claude-multi-woker 目录
+# Return to claude-multi-woker directory
 cd ../claude-multi-woker
 
-# 启动多实例
+# Launch multi-instance system
 python run.py
 ```
 
-### 步骤 3: 切换到 coordinator 标签页并启动项目
+### Step 3: Switch to Coordinator Tab and Start Project
 
-在 coordinator 标签页中输入以下启动消息：
+Enter the following startup message in the coordinator tab:
 
 ```
-开始新项目协作模式
+Start new project collaboration mode
 
-请按照以下步骤初始化项目：
+Please initialize the project following these steps:
 
-1. 了解项目需求
-   - 询问用户项目名称、类型、核心功能
-   - 询问技术栈偏好
-   - 询问是否需要多角色协作
+1. Understand project requirements
+   - Ask user for project name, type, core features
+   - Ask for technology stack preferences
+   - Ask if multi-role collaboration is needed
 
-2. 创建项目文档
-   - 创建 memory-bank/ 目录
-   - 创建 TASK_PROGRESS.md 任务追踪文件
-   - 创建 game-design-document.md 或设计文档
+2. Create project documents
+   - Create memory-bank/ directory
+   - Create TASK_PROGRESS.md task tracking file
+   - Create game-design-document.md or design document
 
-3. 配置角色并开始协作
-   - 根据项目需求向 architect 发送设计任务
-   - 协调后续开发和测试
+3. Configure roles and start collaboration
+   - Send design tasks to architect based on requirements
+   - Coordinate subsequent development and testing
 
-现在开始：请先询问用户的项目需求。
+Start now: Please first ask the user about project requirements.
 ```
 
-### 步骤 4: 与 coordinator 交互
+### Step 4: Interact with Coordinator
 
-coordinator 会自动：
-- 询问你的项目需求
-- 创建必要的文档
-- 启动多角色协作流程
+The coordinator will automatically:
+- Ask about your project requirements
+- Create necessary documents
+- Launch multi-role collaboration workflow
 
 ---
 
-## 🔄 继续已存在的项目
+## 🔄 Continue Existing Project
 
-如果你的项目已经存在（有 TASK_PROGRESS.md），只需：
+If your project already exists (has TASK_PROGRESS.md), simply:
 
-### 在 coordinator 标签页中说：
+### In the coordinator tab, say:
 
 ```
-继续
+continue
 ```
 
-coordinator 会自动：
-1. 读取 TASK_PROGRESS.md
-2. 恢复项目状态
-3. 继续协调工作
+The coordinator will automatically:
+1. Read TASK_PROGRESS.md
+2. Restore project status
+3. Continue coordinating work
 
 ---
 
-## 📖 更多信息
+## 📖 More Information
 
-- 完整的启动和恢复指南：`claude-multi-woker/STARTUP_GUIDE.md`
-- 快速参考卡片：`claude-multi-woker/QUICK_START.txt`
-- 强制性规则：`claude-multi-woker/STATUS_SYNC_RULES.md`
+- Complete startup and recovery guide: See [MULTI_WORKER_RULES.md](MULTI_WORKER_RULES.md)
+- Quick reference card: See [QUICK_REFERENCE.md](QUICK_REFERENCE.md)
+- Mandatory rules: See `.claude/COORDINATOR_INSTRUCTIONS.md`
 
 ---
 
-**版本**: v1.0
-**最后更新**: 2026-01-30
+**Version**: v1.0  
+**Last Updated**: January 30, 2026

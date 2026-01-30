@@ -1,155 +1,163 @@
-# Claude 项目配置
+# Claude Project Configuration
 
-## 🔒 强制性开发规范
+**Language**: [English](CLAUDE.md) | [中文](docs/cn/CLAUDE.md)
 
-⚠️ **CRITICAL**: 在执行任何任务前，必须先阅读以下文件：
+---
 
-### 1. 必读文档（按优先级）
+## 🔒 Mandatory Development Guidelines
+
+⚠️ **CRITICAL**: Before executing any task, you must read the following files:
+
+### 1. Required Reading (by Priority)
 
 ```
-优先级 0: .claude/ALL_ROLES_INSTRUCTIONS.md - 所有角色（除coordinator）必读！
-优先级 1: README.md         - Vibe Coding 核心原则和开发规范
-优先级 2: MULTI_WORKER_RULES.md  - 多角色协作工作流程
-优先级 3: .claude/COORDINATOR_INSTRUCTIONS.md  - Coordinator 角色指令
+Priority 0: .claude/ALL_ROLES_INSTRUCTIONS.md - Required for all roles (except coordinator)!
+Priority 1: README.md         - Vibe Coding core principles and development guidelines
+Priority 2: MULTI_WORKER_RULES.md  - Multi-role collaboration workflow
+Priority 3: .claude/COORDINATOR_INSTRUCTIONS.md  - Coordinator role instructions
 ```
 
-### 1.1 角色必读指南
+### 1.1 Role-Specific Reading Guide
 
-#### 🔴 如果你是任何角色（architect/coder/test/ui/docs 等）
+#### 🔴 If You Are Any Role (architect/coder/test/ui/docs, etc.)
 
-**必须阅读**: `.claude/ALL_ROLES_INSTRUCTIONS.md`
+**Must Read**: `.claude/ALL_ROLES_INSTRUCTIONS.md`
 
-**最重要的规则**:
-- 任务完成后**必须**通知 coordinator
-- 必须使用标准完成消息模板
-- 任务完成后**必须**清理上下文（`/clear`）
+**Most Important Rules**:
+- **Must** notify coordinator after task completion
+- Must use standard completion message template
+- **Must** clear context (`/clear`) after task completion
 
-详见：`.claude/ALL_ROLES_INSTRUCTIONS.md`
+See: `.claude/ALL_ROLES_INSTRUCTIONS.md`
 
-#### 🟢 如果你是 coordinator 角色
+#### 🟢 If You Are the Coordinator Role
 
-**必须阅读**: `.claude/COORDINATOR_INSTRUCTIONS.md`
+**Must Read**: `.claude/COORDINATOR_INSTRUCTIONS.md`
 
-**最重要的指令**: 处理用户的"继续"命令
-- 当用户说"继续"时，首先检查是否存在 `TASK_PROGRESS.md`
-- 如果存在 → 读取并恢复项目状态
-- 如果不存在 → 启动新项目流程
+**Most Important Instruction**: Handle user's "continue" command
+- When user says "continue", first check if `TASK_PROGRESS.md` exists
+- If exists → Read and restore project status
+- If not exists → Start new project workflow
 
-详见：`.claude/COORDINATOR_INSTRUCTIONS.md`
+See: `.claude/COORDINATOR_INSTRUCTIONS.md`
 
-### 2. 核心原则（来自 README.md）
+### 2. Core Principles (from README.md)
 
 #### 🔑 Key Principle
 **"Planning is everything. Do NOT let the AI plan autonomously, or your codebase will become an unmanageable mess."**
 
-#### 📐 强制性规则
+#### 📐 Mandatory Rules
 
-1. **模块化优先**
-   - ✅ 使用多个文件，保持代码模块化
-   - ❌ 禁止创建单体文件（monolith）
-   - ✅ 每个文件职责单一，清晰明确
+1. **Modularity First**
+   - ✅ Use multiple files, keep code modular
+   - ❌ Forbidden to create monolith files
+   - ✅ Each file has single, clear responsibility
 
-2. **Always Rules（始终遵循）**
-   - 在编写任何代码前，先阅读 `memory-bank/@architecture.md`
-   - 在编写任何代码前，先阅读 `memory-bank/@game-design-document.md`
-   - 完成主要功能后，更新 `memory-bank/@architecture.md`
+2. **Always Rules (Always Follow)**
+   - Before writing any code, read `memory-bank/@architecture.md`
+   - Before writing any code, read `memory-bank/@game-design-document.md`
+   - After completing major features, update `memory-bank/@architecture.md`
 
-3. **上下文管理**
-   - 经常使用 `/clear` 或 `/new` 清空上下文
-   - 保持 context usage 保持在 50-60% 以下以获得最佳性能
-   - 每完成一个步骤后，记录到 `progress.md`
+3. **Context Management**
+   - Frequently use `/clear` or `/new` to clear context
+   - Keep context usage below 50-60% for optimal performance
+   - After completing each step, record in `progress.md`
 
-4. **迭代开发**
-   - 不一次完成整个功能
-   - 每个小步骤都要有测试验证
-   - 等待用户验证后再进行下一步
+4. **Iterative Development**
+   - Don't complete entire feature at once
+   - Each small step requires testing validation
+   - Wait for user validation before next step
 
-5. **交互式需求收集（强制）** ⚠️
-   - ✅ **必须使用 `AskUserQuestion` 工具**收集用户需求和偏好
-   - ❌ **禁止**用文本列出问题让用户回答
-   - ✅ 让用户通过勾选/选择的方式提供需求
-   - ✅ 适用于：项目启动、功能选择、技术栈选型等场景
+5. **Interactive Requirements Gathering (Mandatory)** ⚠️
+   - ✅ **Must use `AskUserQuestion` tool** to collect user requirements and preferences
+   - ❌ **Forbidden** to list questions in text for user to answer
+   - ✅ Let users provide requirements through checkboxes/selections
+   - ✅ Applicable to: project startup, feature selection, tech stack choices, etc.
 
-6. **分支管理检查（强制）** ⚠️
-   - ✅ **任何任务启动时，必须先显示当前分支**
-   - ✅ **使用 AskUserQuestion 工具让用户选择分支策略**
-   - ✅ **如果选择切换分支，再收集目标分支名称**
-   - ✅ **如果分支不存在，先提示再创建并切换**
-   - ✅ **每个操作步骤都要明确告知用户**
-   - ❌ **禁止**自动判断或猜测应该使用哪个分支
+6. **Branch Management Check (Mandatory)** ⚠️
+   - ✅ **At task startup, must first display current branch**
+   - ✅ **Use AskUserQuestion tool to let user choose branch strategy**
+   - ✅ **If switching branch, then collect target branch name**
+   - ✅ **If branch doesn't exist, prompt before creating and switching**
+   - ✅ **Clearly inform user of each operation step**
+   - ❌ **Forbidden** to automatically determine or guess which branch to use
 
-   **执行流程**：
+   **Execution Flow**:
    ```
-   任务启动时：
-   1. 显示: "当前分支: [branch-name]"
+   At task startup:
+   1. Display: "Current branch: [branch-name]"
 
-   2. 询问分支策略（使用 AskUserQuestion）：
-      - 选项1: "使用当前分支 [branch-name]"
-      - 选项2: "切换到新分支（如果未创建会自动创建）"
+   2. Ask branch strategy (using AskUserQuestion):
+      - Option 1: "Use current branch [branch-name]"
+      - Option 2: "Switch to new branch (will auto-create if doesn't exist)"
 
-   3. 如果选择选项2，再次询问（使用 AskUserQuestion）：
-      "请输入新分支名称："
-      - 选项1: "feature-gobang"
-      - 选项2: "dev-game"
-      - 选项3: "Type something"（让用户自定义）
+   3. If Option 2 selected, ask again (using AskUserQuestion):
+      "Please enter new branch name:"
+      - Option 1: "feature-gobang"
+      - Option 2: "dev-game"
+      - Option 3: "Type something" (user custom input)
 
-   4. 执行分支操作：
-   # 场景 1: 分支不存在
-   → 提示: "分支 '[branch-name]' 不存在，正在创建并切换..."
-   → 执行: git checkout -b [branch-name]
-   → 确认: "✓ 已创建并切换到新分支 '[branch-name]'"
+   4. Execute branch operation:
+   # Scenario 1: Branch doesn't exist
+   → Prompt: "Branch '[branch-name]' doesn't exist, creating and switching..."
+   → Execute: git checkout -b [branch-name]
+   → Confirm: "✓ Created and switched to new branch '[branch-name]'"
 
-   # 场景 2: 分支已存在
-   → 执行: git checkout [branch-name]
-   → 确认: "✓ 已切换到已有分支 '[branch-name]'"
+   # Scenario 2: Branch exists
+   → Execute: git checkout [branch-name]
+   → Confirm: "✓ Switched to existing branch '[branch-name]'"
 
-   # 场景 3: 选择使用当前分支
-   → 确认: "✓ 继续使用当前分支 '[branch-name]'"
+   # Scenario 3: Use current branch
+   → Confirm: "✓ Continuing with current branch '[branch-name]'"
    ```
 
-## 🤖 多角色协作规范
+## 🤖 Multi-Role Collaboration Guidelines
 
-### 工作流程
+### Workflow
 
-1. **创建项目前**: 配置角色 (`claude-multi-woker/cmw.config`)
-2. **启动协作**: 在 WezTerm 中运行 `python run.py`
-3. **分配任务**: 通过 coordinator 角色协调
-4. **角色通信**: 使用 `python send <角色> "消息"`
-5. **完成审计**: 项目完成后进行多维度审计
+1. **Before Creating Project**: Configure roles (`claude-multi-woker/cmw.config`)
+2. **Start Collaboration**: Run `python run.py` in WezTerm
+3. **Assign Tasks**: Coordinate through coordinator role
+4. **Role Communication**: Use `python send <role> "message"`
+5. **Complete Audit**: Conduct multi-dimensional audit after project completion
 
-### 快速命令
+### Quick Commands
 
 ```bash
-# 启动多实例
+# Start multi-instance
 cd claude-multi-woker && python run.py
 
-# 角色通信
-python send coordinator "任务已完成"
-python send architect "需要架构设计"
+# Role communication
+python send coordinator "Task completed"
+python send architect "Need architecture design"
 ```
 
-## 📂 项目结构
+## 📂 Project Structure
 
 ```
-项目根目录/
-├── CLAUDE.md                  # 本文件，自动读取
-├── README.md                  # Vibe Coding 规范（必读）
-├── MULTI_WORKER_RULES.md      # 多角色协作规范（必读）
-├── claude-multi-woker/        # 多实例协作工具
-└── .claude/CLAUDE.md          # 项目级配置
+Project Root/                      # ← Current directory (your actual project)
+├── CLAUDE.md                      # This file, auto-read
+├── README.md                      # Vibe Coding guidelines (required reading)
+├── MULTI_WORKER_RULES.md          # Multi-role collaboration guidelines (required)
+├── claude-multi-woker/            # ⚡ Multi-instance collaboration toolkit (tool directory)
+│   └── run.py                     # ← Start multi-role system from here
+│   └── send                       # ← Role communication tool
+└── .claude/
+    ├── COORDINATOR_INSTRUCTIONS.md # Coordinator-specific instructions
+    └── ALL_ROLES_INSTRUCTIONS.md   # All roles (except coordinator) instructions
 ```
 
-## ⚡ 快速检查清单
+## ⚡ Quick Checklist
 
-在开始任何开发任务前，确认：
+Before starting any development task, confirm:
 
-- [ ] 已阅读 `README.md` 中的核心原则
-- [ ] 已阅读 `MULTI_WORKER_RULES.md` 中的协作流程
-- [ ] 确认是否需要多角色协作
-- [ ] 理解项目的架构和设计文档
-- [ ] 准备好模块化的代码结构
+- [ ] Read core principles in `README.md`
+- [ ] Read collaboration workflow in `MULTI_WORKER_RULES.md`
+- [ ] Confirm if multi-role collaboration is needed
+- [ ] Understand project architecture and design documents
+- [ ] Prepared modular code structure
 
 ---
 
-**最后更新**: 2025-01-30
-**版本**: v1.1
+**Last Updated**: January 30, 2026  
+**Version**: v1.1
