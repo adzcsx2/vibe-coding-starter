@@ -1,140 +1,144 @@
-# 任务进度追踪表
+**Language**: [English](TASK_PROGRESS.md.template) | [中文](docs/cn/TASK_PROGRESS.md.template)
 
-> **重要**: 本文件由 coordinator 维护，所有角色必须实时同步任务状态
+---
+
+# Task Progress Tracking
+
+> **Important**: This file is maintained by the coordinator. All roles must synchronize task status in real-time.
 >
-> **更新规则**: 任何状态变更必须立即更新此文件并通知 coordinator
+> **Update Rules**: Any status change must be immediately updated in this file and reported to the coordinator.
 
 ---
 
-## 📋 任务列表
+## 📋 Task List
 
-| ID | 任务描述 | 分配给 | 状态 | 分配时间 | 完成时间 | 进度 | 备注 |
-|----|---------|--------|------|----------|----------|------|------|
-| - | 示例：设计系统架构 | architect | ⏳ 待开始 | - | - | 0% | 等待启动 |
+| ID | Task Description | Assigned To | Status | Assigned Time | Completed Time | Progress | Notes |
+|----|-----------------|-------------|--------|---------------|----------------|----------|-------|
+| - | Example: Design System Architecture | architect | ⏳ Pending | - | - | 0% | Waiting to start |
 
 ---
 
-## 🎯 状态图例
+## 🎯 Status Legend
 
-- ⏳ **待开始** (Pending) - 任务已创建，等待分配
-- 🔄 **进行中** (In Progress) - 任务正在执行
-- 🔄 **待测试** (Testing) - **coder任务专用**：开发完成，等待test验收
-- ⏸️ **已阻塞** (Blocked) - 任务遇到阻碍，需要协调
-- ✅ **已完成** (Completed) - 任务完成，已验收
-- ❌ **已取消** (Cancelled) - 任务取消，不再执行
+- ⏳ **Pending** - Task created, waiting for assignment
+- 🔄 **In Progress** - Task is being executed
+- 🧪 **Testing** - **Coder tasks only**: Development complete, waiting for test validation
+- ⏸️ **Blocked** - Task encountered obstacles, needs coordination
+- ✅ **Completed** - Task finished and validated
+- ❌ **Cancelled** - Task cancelled, no longer executing
 
-### ⚠️ 特别说明：coder 任务的状态流转
+### ⚠️ Special Note: Coder Task Status Flow
 
 ```
-coder 任务流程：
-⏳ 待开始 → 🔄 进行中 → 🔄 待测试 → ✅ 已完成
-                              ↓ (test发现问题)
-                         🔄 进行中 (修复) → 🔄 待测试
+Coder Task Flow:
+⏳ Pending → 🔄 In Progress → 🧪 Testing → ✅ Completed
+                                   ↓ (test found issues)
+                              🔄 In Progress (fix) → 🧪 Testing
 ```
 
-**强制规则**：
-- coder 完成开发后，必须标记为 "🔄 待测试"
-- coordinator 收到后，立即分配 test 验收
-- test 验收通过后，才能标记为 "✅ 已完成"
-- test 发现问题，返回 "🔄 进行中" 状态修复
+**Mandatory Rules**:
+- After coder completes development, must mark as "🧪 Testing"
+- Coordinator receives notification, immediately assigns test for validation
+- Only after test validation passes can it be marked as "✅ Completed"
+- If test finds issues, returns to "🔄 In Progress" status for fixes
 
 ---
 
-## 📊 项目概览
+## 📊 Project Overview
 
-**项目名称**: [填写项目名称]
-**项目类型**: [Web应用/CLI工具/库/其他]
-**开始时间**: [YYYY-MM-DD]
-**预计完成**: [YYYY-MM-DD]
+**Project Name**: [Fill in project name]
+**Project Type**: [Web App/CLI Tool/Library/Other]
+**Start Date**: [YYYY-MM-DD]
+**Estimated Completion**: [YYYY-MM-DD]
 
-**总体进度**:
-- 总任务数: 0
-- 已完成: 0 (0%)
-- 进行中: 0
-- 待开始: 0
-- 已阻塞: 0
-
----
-
-## 📝 最近更新
-
-<!-- 按时间倒序记录 -->
-- **[时间]**: [更新内容]
-  - 操作人: [角色]
-  - 变更: [具体描述]
+**Overall Progress**:
+- Total Tasks: 0
+- Completed: 0 (0%)
+- In Progress: 0
+- Pending: 0
+- Blocked: 0
 
 ---
 
-## 🚨 阻塞问题
+## 📝 Recent Updates
 
-<!-- 记录当前阻塞的任务和问题 -->
-| 任务 ID | 阻塞原因 | 负责人 | 优先级 | 状态 |
-|---------|---------|--------|--------|------|
-| - | 示例：等待 API 文档 | coordinator | 高 | 待解决 |
-
----
-
-## 💬 重要决策记录
-
-<!-- 记录项目中的重要决策，便于上下文恢复 -->
-| 时间 | 决策内容 | 影响范围 |
-|------|---------|---------|
-| - | 示例：采用前后端分离架构 | 全局 |
+<!-- Record in reverse chronological order -->
+- **[Time]**: [Update content]
+  - Operator: [Role]
+  - Changes: [Detailed description]
 
 ---
 
-## 🔄 上下文恢复指南
+## 🚨 Blocking Issues
 
-> 当使用 `/clear` 清理上下文后，请按以下步骤恢复：
+<!-- Record currently blocked tasks and issues -->
+| Task ID | Blocking Reason | Responsible | Priority | Status |
+|---------|----------------|-------------|----------|--------|
+| - | Example: Waiting for API documentation | coordinator | High | Pending resolution |
 
-1. **读取本文件**: 了解当前任务进度
-2. **查看进行中任务**: 找到自己正在执行的任务
-3. **读取相关文档**: architecture.md、game-design-document.md 等
-4. **汇报状态**: 向 coordinator 确认当前工作状态
+---
 
-**恢复提示词模板**:
+## 💬 Important Decision Log
+
+<!-- Record important project decisions for context recovery -->
+| Time | Decision Content | Impact Scope |
+|------|-----------------|--------------|
+| - | Example: Adopt frontend-backend separation architecture | Global |
+
+---
+
+## 🔄 Context Recovery Guide
+
+> After using `/clear` to clean context, follow these steps to recover:
+
+1. **Read this file**: Understand current task progress
+2. **Check in-progress tasks**: Find your ongoing tasks
+3. **Read related documents**: architecture.md, game-design-document.md, etc.
+4. **Report status**: Confirm current work status with coordinator
+
+**Recovery Template**:
 ```
-我已经清空了上下文。根据 TASK_PROGRESS.md：
-- 当前任务 ID: [ID]
-- 任务描述: [描述]
-- 当前进度: [百分比]%
-- 最后操作: [时间] [操作]
-请确认我是否需要继续执行该任务。
+I have cleared my context. According to TASK_PROGRESS.md:
+- Current Task ID: [ID]
+- Task Description: [Description]
+- Current Progress: [Percentage]%
+- Last Operation: [Time] [Operation]
+Please confirm if I should continue executing this task.
 ```
 
 ---
 
-## 📌 使用说明
+## 📌 Usage Instructions
 
-### coordinator 职责
-- ✅ 创建和维护本文件
-- ✅ 分配任务时更新状态
-- ✅ 接收进度汇报后更新状态
-- ✅ 定期检查任务状态（每 10 分钟）
-- ✅ 协调阻塞问题的解决
+### Coordinator Responsibilities
+- ✅ Create and maintain this file
+- ✅ Update status when assigning tasks
+- ✅ Update status after receiving progress reports
+- ✅ Regularly check task status (every 10 minutes)
+- ✅ Coordinate resolution of blocking issues
 
-### 执行角色职责 (architect/coder/test 等)
-- ✅ 接收任务后回复确认
-- ✅ 完成里程碑后汇报进度
-- ✅ 完成任务后通知 coordinator
-- ✅ 遇到问题立即报告
-- ✅ context > 60% 时清理前更新此文件
+### Execution Role Responsibilities (architect/coder/test, etc.)
+- ✅ Reply confirmation after receiving tasks
+- ✅ Report progress after completing milestones
+- ✅ Notify coordinator after completing tasks
+- ✅ Report problems immediately
+- ✅ Update this file before cleaning context when context > 60%
 
-### 更新示例
+### Update Examples
 
 ```markdown
-#### 示例 1: 分配新任务
-| 1 | 设计用户认证系统 | architect | 🔄 进行中 | T1 | - | 0% | 预计 T2 完成 |
+#### Example 1: Assign New Task
+| 1 | Design User Authentication System | architect | 🔄 In Progress | T1 | - | 0% | Expected T2 completion |
 
-#### 示例 2: 进度更新
-| 1 | 设计用户认证系统 | architect | 🔄 进行中 | T1 | - | 50% | 已完成数据库设计 |
+#### Example 2: Progress Update
+| 1 | Design User Authentication System | architect | 🔄 In Progress | T1 | - | 50% | Database design completed |
 
-#### 示例 3: 任务完成
-| 1 | 设计用户认证系统 | architect | ✅ 已完成 | T1 | T2 | 100% | 文档在 docs/auth.md |
+#### Example 3: Task Completion
+| 1 | Design User Authentication System | architect | ✅ Completed | T1 | T2 | 100% | Documentation in docs/auth.md |
 ```
 
 ---
 
-**最后更新**: [自动更新时间]
-**维护角色**: coordinator
-**检查频率**: 每 10 分钟
+**Last Updated**: [Auto-update time]
+**Maintained By**: coordinator
+**Check Frequency**: Every 10 minutes

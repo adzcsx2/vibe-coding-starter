@@ -1,207 +1,211 @@
-# 所有角色（除 Coordinator）必读指南
-
-> **适用范围**: architect, coder, test, ui, docs, frontend, backend, 以及所有未来新增的角色
-
-## 🚨 你最重要的责任
-
-作为一个角色（architect/coder/test 等），你有一个**不可推卸的责任**：
-
-### 任务完成后，必须通知 coordinator！
+**Language**: [English](.claude/ALL_ROLES_INSTRUCTIONS.md) | [中文](docs/cn/ALL_ROLES_INSTRUCTIONS.md)
 
 ---
 
-## ⚠️ 为什么这很重要？
+# Essential Guide for All Roles (Except Coordinator)
 
-### 问题场景
+> **Applicable to**: architect, coder, test, ui, docs, frontend, backend, and all future roles
+
+## 🚨 Your Most Important Responsibility
+
+As a role (architect/coder/test, etc.), you have an **unshirkable responsibility**:
+
+### After completing a task, you MUST notify the coordinator!
+
+---
+
+## ⚠️ Why Is This Critical?
+
+### Problem Scenario
 ```
-T1: coordinator 分配任务给 architect
-T2: architect 开始工作...
-T3: architect 完成任务
-T4: architect 什么都没说 😶
-T5: coordinator 一直等待 😓
-T6: 协作流程卡死 💀
+T1: coordinator assigns task to architect
+T2: architect starts working...
+T3: architect completes task
+T4: architect says nothing 😶
+T5: coordinator keeps waiting 😓
+T6: collaboration flow deadlocks 💀
 ```
 
-### 正确场景
+### Correct Scenario
 ```
-T1: coordinator 分配任务给 architect
-T2: architect 开始工作...
-T3: architect 完成任务
-T4: architect 发送完成通知 ✅
-T5: coordinator 更新状态，分配下一任务 ✅
-T6: 协作流程顺畅 🎉
+T1: coordinator assigns task to architect
+T2: architect starts working...
+T3: architect completes task
+T4: architect sends completion notification ✅
+T5: coordinator updates status, assigns next task ✅
+T6: collaboration flows smoothly 🎉
 ```
 
 ---
 
-## 📋 强制性任务完成流程
+## 📋 Mandatory Task Completion Process
 
-### 步骤 1: 更新 TASK_PROGRESS.md
+### Step 1: Update TASK_PROGRESS.md
 
-在宣布完成前，先更新文件：
+Before announcing completion, update the file:
 
 ```markdown
-| ID | 任务描述 | 分配给 | 状态 | 分配时间 | 完成时间 | 备注 |
-|----|---------|--------|------|----------|----------|------|
-| 1 | 你的任务 | 你的角色 | ✅ 完成 | T1 | T_now | 产出文件已创建 |
+| ID | Task Description | Assigned To | Status | Assigned Time | Completed Time | Notes |
+|----|-----------------|-------------|--------|---------------|----------------|-------|
+| 1 | Your Task | Your Role | ✅ Completed | T1 | T_now | Output files created |
 ```
 
-### 步骤 2: 通知 coordinator
+### Step 2: Notify Coordinator
 
-**必须**使用以下标准模板：
+**Must** use this standard template:
 
 ```bash
-python send coordinator "我是 [你的角色名]
+python send coordinator "I am [your role name]
 
-✅ 任务完成报告:
+✅ Task Completion Report:
 
-任务ID: [从 TASK_PROGRESS.md 读取]
-任务描述: [简短描述]
-完成时间: [当前时间]
+Task ID: [Read from TASK_PROGRESS.md]
+Task Description: [Brief description]
+Completion Time: [Current time]
 
-📁 产出文件:
-- [文件1完整路径]
-- [文件2完整路径]
-- [如有更多，继续列出]
+📁 Output Files:
+- [Complete path to file 1]
+- [Complete path to file 2]
+- [Continue listing if more]
 
-📝 完成说明:
-[简要说明：做了什么，如何解决的]
+📝 Completion Notes:
+[Brief explanation: what was done, how it was solved]
 
-⚠️ 上下文已清理: 是/否（如果否，说明原因）
-等待状态: 等待下一任务分配
+⚠️ Context Cleared: Yes/No (If no, explain why)
+Waiting Status: Waiting for next task assignment
 
-请 coordinator 更新 TASK_PROGRESS.md 并分配下一任务。"
+Please update TASK_PROGRESS.md and assign the next task."
 ```
 
-### 步骤 3: 清理上下文
+### Step 3: Clean Context
 
-任务完成后，**必须**清理上下文：
+After task completion, **must** clean context:
 
 ```bash
-# 清理对话
+# Clear conversation
 /clear
 
-# 等待新任务时，恢复上下文
-"请读取 TASK_PROGRESS.md，我是 [角色名]，当前状态：等待新任务"
+# When waiting for new task, restore context
+"Please read TASK_PROGRESS.md. I am [role name], current status: waiting for new task"
 ```
 
 ---
 
-## 🔄 完整工作流示例
+## 🔄 Complete Workflow Example
 
-### 示例：architect 完成架构设计
+### Example: architect completes architecture design
 
 ```bash
-# T1: 收到任务
-python send coordinator "我是 architect，收到任务，开始执行架构设计..."
+# T1: Receive task
+python send coordinator "I am architect, received task, starting architecture design..."
 
-# T2-T10: 工作中...（设计、编写文档）
+# T2-T10: Working... (designing, writing documentation)
 
-# T11: 任务完成
-# 11.1 更新 TASK_PROGRESS.md
-# 11.2 通知 coordinator
-python send coordinator "我是 architect
+# T11: Task completed
+# 11.1 Update TASK_PROGRESS.md
+# 11.2 Notify coordinator
+python send coordinator "I am architect
 
-✅ 任务完成报告:
+✅ Task Completion Report:
 
-任务ID: 1
-任务描述: Unity 项目架构设计
-完成时间: 2026-01-30 14:30
+Task ID: 1
+Task Description: Unity Project Architecture Design
+Completion Time: 2026-01-30 14:30
 
-📁 产出文件:
+📁 Output Files:
 - memory-bank/architecture.md
 - memory-bank/tech-stack.md
 
-📝 完成说明:
-已完成 9 个模块的架构设计，采用单例模式和对象池优化性能。
-架构文档包含完整的类图和模块说明。
+📝 Completion Notes:
+Completed architecture design for 9 modules, using Singleton pattern and object pooling for performance optimization.
+Architecture documentation includes complete class diagrams and module descriptions.
 
-⚠️ 上下文已清理: 是
-等待状态: 等待下一任务分配
+⚠️ Context Cleared: Yes
+Waiting Status: Waiting for next task assignment
 
-请 coordinator 更新 TASK_PROGRESS.md 并分配下一任务。"
+Please update TASK_PROGRESS.md and assign the next task."
 
-# 11.3 清理上下文
+# 11.3 Clean context
 /clear
 ```
 
 ---
 
-## 🚨 特殊情况处理
+## 🚨 Special Situation Handling
 
-### 情况 1: 任务被阻塞
+### Situation 1: Task is Blocked
 
 ```bash
-python send coordinator "我是 [角色名]
+python send coordinator "I am [role name]
 
-⚠️ 任务阻塞报告:
+⚠️ Task Blocking Report:
 
-任务ID: [任务ID]
-阻塞原因: [详细描述]
-需要协调: [需要谁的帮助]
+Task ID: [Task ID]
+Blocking Reason: [Detailed description]
+Coordination Needed: [Whose help is needed]
 
-示例:
-任务ID: 3
-阻塞原因: 缺少 API 文档，无法编写测试用例
-需要协调: architect 或 coder
+Example:
+Task ID: 3
+Blocking Reason: Missing API documentation, cannot write test cases
+Coordination Needed: architect or coder
 
-等待 coordinator 协调解决。"
+Waiting for coordinator to coordinate resolution."
 ```
 
-### 情况 2: 任务需要拆分
+### Situation 2: Task Needs to be Split
 
 ```bash
-python send coordinator "我是 [角色名]
+python send coordinator "I am [role name]
 
-📊 任务拆分建议:
+📊 Task Split Suggestion:
 
-原任务: [任务ID]
-拆分原因: [为什么需要拆分]
+Original Task: [Task ID]
+Split Reason: [Why split is needed]
 
-建议拆分为:
-- 子任务 A: [描述] - [预计时间]
-- 子任务 B: [描述] - [预计时间]
+Suggested Split:
+- Subtask A: [Description] - [Estimated time]
+- Subtask B: [Description] - [Estimated time]
 
-请确认并更新 TASK_PROGRESS.md。"
+Please confirm and update TASK_PROGRESS.md."
 ```
 
-### 情况 3: 需要更多时间
+### Situation 3: Need More Time
 
 ```bash
-python send coordinator "我是 [角色名]
+python send coordinator "I am [role name]
 
-⏱️ 时间延期申请:
+⏱️ Time Extension Request:
 
-任务ID: [任务ID]
-原预计: [时间]
-新预计: [时间]
-延期原因: [原因说明]
+Task ID: [Task ID]
+Original Estimate: [Time]
+New Estimate: [Time]
+Extension Reason: [Reason explanation]
 
-请求批准延期。"
+Requesting approval for extension."
 ```
 
 ---
 
-## ✅ 检查清单
+## ✅ Checklist
 
-完成任务前，确认：
+Before completing a task, confirm:
 
-- [ ] TASK_PROGRESS.md 已更新（状态 → ✅ 完成）
-- [ ] 产出文件已创建并保存
-- [ ] 已向 coordinator 发送完成通知
-- [ ] 通知消息使用了标准模板
-- [ ] 清理了上下文（/clear）
-
----
-
-## 🎯 记住这三句话
-
-1. **完成任务后，必须通知 coordinator**
-2. **通知必须使用标准模板**
-3. **通知后必须清理上下文**
+- [ ] TASK_PROGRESS.md updated (status → ✅ Completed)
+- [ ] Output files created and saved
+- [ ] Completion notification sent to coordinator
+- [ ] Notification message used standard template
+- [ ] Context cleaned (/clear)
 
 ---
 
-**文档版本**: v1.0
-**创建日期**: 2026-01-30
-**适用范围**: 所有角色（除 coordinator 外）
+## 🎯 Remember These Three Things
+
+1. **After completing a task, must notify coordinator**
+2. **Notification must use standard template**
+3. **After notification, must clean context**
+
+---
+
+**Document Version**: v1.0
+**Creation Date**: 2026-01-30
+**Applicable Scope**: All roles (except coordinator)
