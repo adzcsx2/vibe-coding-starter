@@ -9,7 +9,19 @@
 ```
 优先级 1: README.md         - Vibe Coding 核心原则和开发规范
 优先级 2: MULTI_WORKER_RULES.md  - 多角色协作工作流程
+优先级 3: .claude/COORDINATOR_INSTRUCTIONS.md  - Coordinator 角色指令
 ```
+
+### 1.1 如果你扮演 coordinator 角色
+
+**必须阅读**: `.claude/COORDINATOR_INSTRUCTIONS.md`
+
+**最重要的指令**: 处理用户的"继续"命令
+- 当用户说"继续"时，首先检查是否存在 `TASK_PROGRESS.md`
+- 如果存在 → 读取并恢复项目状态
+- 如果不存在 → 启动新项目流程
+
+详见：`.claude/COORDINATOR_INSTRUCTIONS.md`
 
 ### 2. 核心原则（来自 README.md）
 

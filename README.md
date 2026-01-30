@@ -24,6 +24,22 @@ This project combines the **Vibe Coding methodology** with a **Multi-Worker AI c
 
 ## 🚀 Quick Start
 
+### For New Users
+
+**Step 1**: Read [START_PROJECT.md](START_PROJECT.md) to learn how to start a new project or continue an existing one.
+
+**Step 2**: Start the multi-worker system:
+```bash
+cd claude-multi-woker
+python run.py
+```
+
+**Step 3**: In the coordinator tab, say **"继续"** (continue) to:
+- Start a new project (if no TASK_PROGRESS.md exists)
+- Resume an existing project (if TASK_PROGRESS.md exists)
+
+That's it! The coordinator will guide you through the rest.
+
 ### Prerequisites
 
 - **Claude Code** (Pro subscription, ~$20/month) OR **Codex CLI** (Plus subscription, ~$20/month)
@@ -37,13 +53,11 @@ This project combines the **Vibe Coding methodology** with a **Multi-Worker AI c
 git clone https://github.com/adzcsx2/vibe-coding-starter.git
 cd vibe-coding-starter
 
-# Start Claude Code
-claude
+# Start the multi-worker system
+cd claude-multi-woker
+python run.py
 
-# Claude will automatically read:
-# - README.md (this file)
-# - CLAUDE.md (development rules)
-# - MULTI_WORKER_RULES.md (multi-role collaboration guide)
+# In coordinator tab, type: 继续
 ```
 
 ---
