@@ -1,0 +1,86 @@
+# Claude 项目配置
+
+## 🔒 强制性开发规范
+
+⚠️ **CRITICAL**: 在执行任何任务前，必须先阅读以下文件：
+
+### 1. 必读文档（按优先级）
+
+```
+优先级 1: README.md         - Vibe Coding 核心原则和开发规范
+优先级 2: MULTI_WORKER_RULES.md  - 多角色协作工作流程
+```
+
+### 2. 核心原则（来自 README.md）
+
+#### 🔑 Key Principle
+**"Planning is everything. Do NOT let the AI plan autonomously, or your codebase will become an unmanageable mess."**
+
+#### 📐 强制性规则
+
+1. **模块化优先**
+   - ✅ 使用多个文件，保持代码模块化
+   - ❌ 禁止创建单体文件（monolith）
+   - ✅ 每个文件职责单一，清晰明确
+
+2. **Always Rules（始终遵循）**
+   - 在编写任何代码前，先阅读 `memory-bank/@architecture.md`
+   - 在编写任何代码前，先阅读 `memory-bank/@game-design-document.md`
+   - 完成主要功能后，更新 `memory-bank/@architecture.md`
+
+3. **上下文管理**
+   - 经常使用 `/clear` 或 `/new` 清空上下文
+   - 保持 context usage 保持在 50-60% 以下以获得最佳性能
+   - 每完成一个步骤后，记录到 `progress.md`
+
+4. **迭代开发**
+   - 不一次完成整个功能
+   - 每个小步骤都要有测试验证
+   - 等待用户验证后再进行下一步
+
+## 🤖 多角色协作规范
+
+### 工作流程
+
+1. **创建项目前**: 配置角色 (`claude-multi-woker/cmw.config`)
+2. **启动协作**: 在 WezTerm 中运行 `python run.py`
+3. **分配任务**: 通过 coordinator 角色协调
+4. **角色通信**: 使用 `python send <角色> "消息"`
+5. **完成审计**: 项目完成后进行多维度审计
+
+### 快速命令
+
+```bash
+# 启动多实例
+cd claude-multi-woker && python run.py
+
+# 角色通信
+python send coordinator "任务已完成"
+python send architect "需要架构设计"
+```
+
+## 📂 项目结构
+
+```
+项目根目录/
+├── CLAUDE.md                  # 本文件，自动读取
+├── README.md                  # Vibe Coding 规范（必读）
+├── MULTI_WORKER_RULES.md      # 多角色协作规范（必读）
+├── claude-multi-woker/        # 多实例协作工具
+└── .claude/CLAUDE.md          # 项目级配置
+```
+
+## ⚡ 快速检查清单
+
+在开始任何开发任务前，确认：
+
+- [ ] 已阅读 `README.md` 中的核心原则
+- [ ] 已阅读 `MULTI_WORKER_RULES.md` 中的协作流程
+- [ ] 确认是否需要多角色协作
+- [ ] 理解项目的架构和设计文档
+- [ ] 准备好模块化的代码结构
+
+---
+
+**最后更新**: 2025-01-30
+**版本**: v1.0
